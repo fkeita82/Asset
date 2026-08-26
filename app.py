@@ -77,31 +77,35 @@ def seed_admin():
         db.session.commit()
 
 
+# --- OAuth / SSO Setup ---
+
 with app.app_context():
     db.create_all()
     seed_roles()
     seed_admin()
 
-
-# --- OAuth / SSO Setup ---
-
-if app.config.get('OKTA_CLIENT_ID'):
-    oauth.register(
-        name='okta',
-        client_id=app.config['OKTA_CLIENT_ID'],
-        client_secret=app.config['OKTA_CLIENT_SECRET'],
-        server_metadata_url=f'https://{app.config["OKTA_DOMAIN"]}/oauth2/{app.config["OKTA_AUTH_SERVER"]}/.well-known/openid-configuration',
-        client_kwargs={'scope': 'openid email profile'},
-    )
-
-if app.config.get('ENTRA_CLIENT_ID'):
-    oauth.register(
-        name='entra',
-        client_id=app.config['ENTRA_CLIENT_ID'],
-        client_secret=app.config['ENTRA_CLIENT_SECRET'],
-        server_metadata_url=f'https://login.microsoftonline.com/{app.config["ENTRA_TENANT_ID"]}/v2.0/.well-known/openid-configuration',
-        client_kwargs={'scope': 'openid email profile'},
-    )
+    if Setting.get_bool('sso_enabled', False):
+        provider = Setting.get('sso_provider', '')
+        if provider == 'okta' or (not provider and Setting.get('okta_client_id')):
+            okta_domain = Setting.get('okta_domain', '')
+            if okta_domain:
+                oauth.register(
+                    name='okta',
+                    client_id=Setting.get('okta_client_id', ''),
+                    client_secret=Setting.get('okta_client_secret', ''),
+                    server_metadata_url=f'https://{okta_domain}/.well-known/openid-configuration',
+                    client_kwargs={'scope': 'openid email profile'},
+                )
+        if provider == 'entra' or (not provider and Setting.get('entra_client_id')):
+            entra_tenant = Setting.get('entra_tenant_id', '')
+            if entra_tenant:
+                oauth.register(
+                    name='entra',
+                    client_id=Setting.get('entra_client_id', ''),
+                    client_secret=Setting.get('entra_client_secret', ''),
+                    server_metadata_url=f'https://login.microsoftonline.com/{entra_tenant}/v2.0/.well-known/openid-configuration',
+                    client_kwargs={'scope': 'openid email profile'},
+                )
 
 
 @app.route('/set_language/<language>')
@@ -178,22 +182,6 @@ def login_okta():
         flash('Okta SSO is not configured.', 'danger')
         return redirect(url_for('login'))
 
-    okta_secret = Setting.get('okta_client_secret') or app.config.get('OKTA_CLIENT_SECRET')
-    okta_domain = Setting.get('okta_domain') or app.config.get('OKTA_DOMAIN')
-    okta_server = Setting.get('okta_auth_server') or app.config.get('OKTA_AUTH_SERVER', 'default')
-
-    if not okta_domain:
-        flash('Okta domain is not configured.', 'danger')
-        return redirect(url_for('login'))
-
-    oauth.register(
-        name='okta',
-        client_id=okta_id,
-        client_secret=okta_secret,
-        server_metadata_url=f'https://{okta_domain}/.well-known/openid-configuration',
-        client_kwargs={'scope': 'openid email profile'},
-    )
-
     redirect_uri = url_for('sso_callback', provider='okta', _external=True)
     return oauth.okta.authorize_redirect(redirect_uri)
 
@@ -204,21 +192,6 @@ def login_entra():
     if not entra_id:
         flash('Entra ID SSO is not configured.', 'danger')
         return redirect(url_for('login'))
-
-    entra_secret = Setting.get('entra_client_secret') or app.config.get('ENTRA_CLIENT_SECRET')
-    entra_tenant = Setting.get('entra_tenant_id') or app.config.get('ENTRA_TENANT_ID')
-
-    if not entra_tenant:
-        flash('Entra ID tenant is not configured.', 'danger')
-        return redirect(url_for('login'))
-
-    oauth.register(
-        name='entra',
-        client_id=entra_id,
-        client_secret=entra_secret,
-        server_metadata_url=f'https://login.microsoftonline.com/{entra_tenant}/v2.0/.well-known/openid-configuration',
-        client_kwargs={'scope': 'openid email profile'},
-    )
 
     redirect_uri = url_for('sso_callback', provider='entra', _external=True)
     return oauth.entra.authorize_redirect(redirect_uri)
