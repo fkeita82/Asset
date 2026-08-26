@@ -1,0 +1,28 @@
+[Unit]
+Description=IT Asset Manager (Gunicorn)
+After=network.target
+
+[Service]
+User=flask-assets
+Group=www-data
+WorkingDirectory=/opt/flask-assets/app
+RuntimeDirectory=flask-assets
+RuntimeDirectoryMode=0755
+
+Environment="PATH=/opt/flask-assets/venv/bin"
+EnvironmentFile=/opt/flask-assets/.env
+
+ExecStart=/opt/flask-assets/venv/bin/gunicorn --config /opt/flask-assets/gunicorn.conf.py wsgi:app
+ExecReload=/bin/kill -s HUP $MAINPID
+Restart=always
+RestartSec=5
+KillMode=mixed
+TimeoutStopSec=10
+
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/run/flask-assets /var/log/flask-assets /opt/flask-assets
+
+[Install]
+WantedBy=multi-user.target
