@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ title }} - IT Asset Manager{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-6">
+        <h1 class="mb-4"><i class="bi bi-{{ 'person-plus' if not employee else 'person-gear' }}"></i> {{ title }}</h1>
+
+        <form method="post" class="card">
+            <div class="card-body">
+                {{ form.hidden_tag() }}
+
+                <div class="row g-3 mb-3">
+                    <div class="col-md-6">
+                        {{ form.first_name.label(class='form-label') }}
+                        {{ form.first_name(class='form-control' + (' is-invalid' if form.first_name.errors else '')) }}
+                        {% for e in form.first_name.errors %}<div class="invalid-feedback">{{ e }}</div>{% endfor %}
+                    </div>
+                    <div class="col-md-6">
+                        {{ form.last_name.label(class='form-label') }}
+                        {{ form.last_name(class='form-control' + (' is-invalid' if form.last_name.errors else '')) }}
+                        {% for e in form.last_name.errors %}<div class="invalid-feedback">{{ e }}</div>{% endfor %}
+                    </div>
+                </div>
+
+                <div class="row g-3 mb-3">
+                    <div class="col-md-6">
+                        {{ form.email.label(class='form-label') }}
+                        {{ form.email(class='form-control' + (' is-invalid' if form.email.errors else '')) }}
+                        {% for e in form.email.errors %}<div class="invalid-feedback">{{ e }}</div>{% endfor %}
+                    </div>
+                    <div class="col-md-6">
+                        {{ form.phone.label(class='form-label') }}
+                        {{ form.phone(class='form-control') }}
+                    </div>
+                </div>
+
+                <div class="row g-3 mb-3">
+                    <div class="col-md-6">
+                        {{ form.department.label(class='form-label') }}
+                        {{ form.department(class='form-control') }}
+                    </div>
+                    <div class="col-md-6">
+                        {{ form.project_id.label(class='form-label') }}
+                        {{ form.project_id(class='form-select') }}
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    {{ form.notes.label(class='form-label') }}
+                    {{ form.notes(class='form-control', rows=3) }}
+                </div>
+            </div>
+            <div class="card-footer d-flex justify-content-between">
+                <a href="{{ url_for('list_employees') }}" class="btn btn-outline-secondary">Cancel</a>
+                {{ form.submit(class='btn btn-dexis') }}
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

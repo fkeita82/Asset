@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+
+{% block title %}Edit {{ role.label }} - IT Asset Manager{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <h1 class="mb-4"><i class="bi bi-shield-lock"></i> Edit Role: {{ role.label }}</h1>
+
+        <form method="post" class="card">
+            <div class="card-body">
+                {{ form.hidden_tag() }}
+                <p class="text-muted">Select the permissions for this role. Changes apply to all users with this role.</p>
+                <div class="row">
+                    {% for group, perms in PERM_GROUPS.items() %}
+                    <div class="col-md-6 mb-3">
+                        <div class="card">
+                            <div class="card-header">
+                                <div class="form-check">
+                                    <input class="form-check-input group-toggle" type="checkbox" id="group_{{ group|replace(' ', '_') }}"
+                                        {{ 'checked' if perms|select('in', role.get_permissions())|list|length == perms|length else '' }}>
+                                    <label class="form-check-label fw-bold" for="group_{{ group|replace(' ', '_') }}">{{ group }}</label>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                {% for p in perms %}
+                                <div class="form-check">
+                                    <input class="form-check-input perm-check" type="checkbox" name="permissions" value="{{ p }}" id="perm_{{ p|replace('.', '_') }}"
+                                        {{ 'checked' if p in role.get_permissions() else '' }}>
+                                    <label class="form-check-label" for="perm_{{ p|replace('.', '_') }}">{{ PERM_LABELS[p] }}</label>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="card-footer d-flex justify-content-between">
+                <a href="{{ url_for('list_roles') }}" class="btn btn-outline-secondary">Cancel</a>
+                {{ form.submit(class='btn btn-dexis') }}
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.querySelectorAll('.group-toggle').forEach(cb => {
+    cb.addEventListener('change', function() {
+        const card = this.closest('.card');
+        card.querySelectorAll('.perm-check').forEach(p => p.checked = this.checked);
+    });
+});
+</script>
+{% endblock %}

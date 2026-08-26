@@ -1,0 +1,128 @@
+{% extends 'base.html' %}
+
+{% block title %}Employees - IT Asset Manager{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1><i class="bi bi-people"></i> Employees</h1>
+    {% if has_perm('employee.create') %}
+    <a href="{{ url_for('new_employee') }}" class="btn btn-dexis">
+        <i class="bi bi-plus-lg"></i> Add Employee
+    </a>
+    {% endif %}
+</div>
+
+<div class="card mb-4">
+    <div class="card-body">
+        <form method="get" class="row g-2 align-items-end">
+            <div class="col-md-6">
+                <label class="form-label">Search</label>
+                <input type="text" name="search" class="form-control" placeholder="Name, email, department..." value="{{ search }}">
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Project</label>
+                <select name="project" class="form-select">
+                    <option value="0">All</option>
+                    {% for p in projects %}
+                        <option value="{{ p.id }}" {{ 'selected' if filter_project == p.id }}>{{ p.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-1">
+                <button type="submit" class="btn btn-dexis w-100"><i class="bi bi-search"></i></button>
+            </div>
+            <div class="col-md-1">
+                <a href="{{ url_for('list_employees') }}" class="btn btn-outline-secondary w-100"><i class="bi bi-x-lg"></i></a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-body p-0">
+        <form method="get" action="{{ url_for('bulk_update_employees') }}" id="bulkEmpForm">
+        <table class="table table-striped table-hover mb-0">
+            <thead>
+                <tr>
+                    {% if has_perm('employee.edit') or has_perm('employee.delete') %}<th style="width:36px"><input class="form-check-input" type="checkbox" id="selectAllEmps"></th>{% endif %}
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Department</th>
+                    <th>Project</th>
+                    <th>Phone</th>
+                    <th>Assets</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for emp in employees %}
+                <tr>
+                    {% if has_perm('employee.edit') or has_perm('employee.delete') %}<td><input class="form-check-input bulk-check" type="checkbox" name="employee_id" value="{{ emp.id }}"></td>{% endif %}
+                    <td><strong><a href="{{ url_for('view_employee', id=emp.id) }}">{{ emp.name }}</a></strong></td>
+                    <td>{{ emp.email or '-' }}</td>
+                    <td>{{ emp.department or '-' }}</td>
+                    <td>{{ emp.project_name or '-' }}</td>
+                    <td>{{ emp.phone or '-' }}</td>
+                    <td><span class="badge bg-primary">{{ emp.assets.count() }}</span></td>
+                    <td>
+                        <a href="{{ url_for('view_employee', id=emp.id) }}" class="btn btn-sm btn-outline-info" title="View"><i class="bi bi-eye"></i></a>
+                        {% if has_perm('employee.edit') %}
+                        <a href="{{ url_for('edit_employee', id=emp.id) }}" class="btn btn-sm btn-outline-primary" title="Edit"><i class="bi bi-pencil"></i></a>
+                        {% endif %}
+                        {% if has_perm('employee.delete') %}
+                        <form method="post" action="{{ url_for('delete_employee', id=emp.id) }}" style="display:inline" onsubmit="return confirm('Delete {{ emp.name }}?')">
+                            <button type="submit" class="btn btn-sm btn-outline-danger" title="Delete"><i class="bi bi-trash"></i></button>
+                        </form>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="9" class="text-center text-muted py-4">No employees yet.
+                        {% if has_perm('employee.create') %}
+                        <a href="{{ url_for('new_employee') }}">Add one</a>.
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% if (has_perm('employee.edit') or has_perm('employee.delete')) and employees %}
+        <div class="card-footer d-flex justify-content-between">
+            <span id="selectedCount" class="text-muted small align-self-center">0 selected</span>
+            <div>
+                {% if has_perm('employee.edit') %}
+                <button type="submit" class="btn btn-primary btn-sm"><i class="bi bi-pencil-square"></i> Bulk Update</button>
+                {% endif %}
+                {% if has_perm('employee.delete') %}
+                <button type="button" class="btn btn-danger btn-sm" onclick="bulkDeleteEmp()"><i class="bi bi-trash"></i> Delete Selected</button>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+        </form>
+    </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+document.getElementById('selectAllEmps')?.addEventListener('change', function() {
+    document.querySelectorAll('.bulk-check').forEach(cb => cb.checked = this.checked);
+    updateSelectedCount();
+});
+document.querySelectorAll('.bulk-check').forEach(cb => cb.addEventListener('change', updateSelectedCount));
+function updateSelectedCount() {
+    const n = document.querySelectorAll('.bulk-check:checked').length;
+    document.getElementById('selectedCount').textContent = n + ' selected';
+}
+function bulkDeleteEmp() {
+    const checked = document.querySelectorAll('.bulk-check:checked');
+    if (!checked.length) { alert('No employees selected.'); return; }
+    if (!confirm('Delete selected employees? Employees with assets will be skipped.')) return;
+    const form = document.getElementById('bulkEmpForm');
+    form.action = '{{ url_for("bulk_delete_employees") }}';
+    form.method = 'post';
+    form.submit();
+}
+</script>
+{% endblock %}

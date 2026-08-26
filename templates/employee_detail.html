@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ employee.name }} - IT Asset Manager{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1><i class="bi bi-person"></i> {{ employee.name }}</h1>
+    <div>
+        {% if has_perm('employee.edit') %}
+        <a href="{{ url_for('edit_employee', id=employee.id) }}" class="btn btn-dexis"><i class="bi bi-pencil"></i> Edit</a>
+        {% endif %}
+        {% if has_perm('employee.delete') %}
+        <form method="post" action="{{ url_for('delete_employee', id=employee.id) }}" style="display:inline" onsubmit="return confirm('Delete {{ employee.name }}?')">
+            <button type="submit" class="btn btn-danger"><i class="bi bi-trash"></i> Delete</button>
+        </form>
+        {% endif %}
+        <a href="{{ url_for('list_employees') }}" class="btn btn-outline-secondary">Back</a>
+    </div>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-6">
+        <div class="card h-100">
+            <div class="card-header"><h5 class="mb-0">Details</h5></div>
+            <div class="card-body">
+                <table class="table table-sm">
+                    <tr><th>Name</th><td>{{ employee.first_name }} {{ employee.last_name }}</td></tr>
+                    <tr><th>Email</th><td>{{ employee.email or '-' }}</td></tr>
+                    <tr><th>Phone</th><td>{{ employee.phone or '-' }}</td></tr>
+                    <tr><th>Department</th><td>{{ employee.department or '-' }}</td></tr>
+                    <tr><th>Project</th><td>{% if employee.assigned_project %}<a href="{{ url_for('view_project', id=employee.assigned_project.id) }}">{{ employee.assigned_project.name }}</a>{% else %}-{% endif %}</td></tr>
+                </table>
+                {% if employee.notes %}
+                <hr>
+                <h6>Notes</h6>
+                <p class="mb-0">{{ employee.notes }}</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card h-100">
+            <div class="card-header"><h5 class="mb-0">Assigned Assets ({{ assets|length }})</h5></div>
+            <div class="card-body p-0">
+                <table class="table table-sm mb-0">
+                    <thead>
+                        <tr>
+                            <th>Asset Tag</th>
+                            <th>Type</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for a in assets %}
+                        <tr>
+                            <td><a href="{{ url_for('view_asset', id=a.id) }}">{{ a.asset_tag_id or '—' }}</a></td>
+                            <td><span class="badge bg-info">{{ a.sub_category }}</span></td>
+                            <td>
+                                <span class="badge {% if a.status == 'In-Storage' %}bg-secondary{% elif a.status == 'Assigned' %}bg-info{% elif a.status == 'Deployed' %}bg-success{% elif a.status == 'In Repair' %}bg-warning text-dark{% elif a.status == 'Retired' %}bg-dark{% else %}bg-secondary{% endif %}">
+                                    {{ a.status }}
+                                </span>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr><td colspan="3" class="text-center text-muted py-3">No assets assigned.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="text-muted small text-end">
+    Created: {{ employee.created_at.strftime('%Y-%m-%d %H:%M') if employee.created_at else '-' }} |
+    Updated: {{ employee.updated_at.strftime('%Y-%m-%d %H:%M') if employee.updated_at else '-' }}
+</div>
+{% endblock %}

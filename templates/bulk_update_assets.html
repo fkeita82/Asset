@@ -1,0 +1,96 @@
+{% extends 'base.html' %}
+
+{% block title %}Bulk Update Assets - IT Asset Manager{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1><i class="bi bi-pencil-square"></i> Bulk Update Assets</h1>
+    <a href="{{ url_for('list_assets') }}" class="btn btn-outline-secondary">Back</a>
+</div>
+
+<p class="text-muted">Updating {{ assets|length }} asset(s). Leave fields blank to keep current values.</p>
+
+<form method="post" onsubmit="return confirm('Update all selected assets?')">
+    <div class="card mb-4">
+        <div class="card-header"><h6 class="mb-0">New Values (leave blank to skip)</h6></div>
+        <div class="card-body">
+            <div class="row g-3">
+                <div class="col-md-3">
+                    <label class="form-label">Status</label>
+                    <select name="new_status" class="form-select">
+                        <option value="">-- Keep Current --</option>
+                        <option value="In-Storage">In-Storage</option>
+                        <option value="Assigned">Assigned</option>
+                        <option value="Deployed">Deployed</option>
+                        <option value="In Repair">In Repair</option>
+                        <option value="Retired">Retired</option>
+                        <option value="Disposed">Disposed</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Location</label>
+                    <input type="text" name="new_location" class="form-control" placeholder="Keep current">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Department</label>
+                    <input type="text" name="new_department" class="form-control" placeholder="Keep current">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Project</label>
+                    <select name="new_project_id" class="form-select">
+                        <option value="0">-- Keep Current --</option>
+                        {% for p in projects %}
+                        <option value="{{ p.id }}">{{ p.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Assigned User</label>
+                    <select name="new_employee_id" class="form-select">
+                        <option value="0">-- Keep Current --</option>
+                        {% for e in employees %}
+                        <option value="{{ e.id }}">{{ e.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-body p-0">
+            <table class="table table-striped mb-0">
+                <thead>
+                    <tr>
+                        <th>Asset Tag</th>
+                        <th>Type</th>
+                        <th>Serial</th>
+                        <th>Status</th>
+                        <th>Location</th>
+                        <th>User</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for asset in assets %}
+                    <tr>
+                        <td>
+                            <input type="hidden" name="asset_id" value="{{ asset.id }}">
+                            <strong>{{ asset.asset_tag_id or '—' }}</strong>
+                        </td>
+                        <td><span class="badge bg-info">{{ asset.sub_category }}</span></td>
+                        <td>{{ asset.serial_number }}</td>
+                        <td>{{ asset.status }}</td>
+                        <td>{{ asset.location or '-' }}</td>
+                        <td>{{ asset.assigned_user or '-' }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <div class="card-footer d-flex justify-content-between">
+            <a href="{{ url_for('list_assets') }}" class="btn btn-outline-secondary">Cancel</a>
+            <button type="submit" class="btn btn-dexis"><i class="bi bi-check-lg"></i> Update {{ assets|length }} Asset(s)</button>
+        </div>
+    </div>
+</form>
+{% endblock %}

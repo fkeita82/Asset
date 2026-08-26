@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+
+{% block title %}Bulk Edit Employees - IT Asset Manager{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1><i class="bi bi-pencil-square"></i> Bulk Edit Employees</h1>
+    <a href="{{ url_for('list_employees') }}" class="btn btn-outline-secondary">Back</a>
+</div>
+
+<form method="post" onsubmit="return confirm('Save all changes?')">
+    <div class="card">
+        <div class="card-body p-0">
+            <table class="table table-striped mb-0">
+                <thead>
+                    <tr>
+                        <th>Delete</th>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Phone</th>
+                        <th>Department</th>
+                        <th>Project</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for emp in employees %}
+                    <tr>
+                        <td class="text-center">
+                            <input class="form-check-input" type="checkbox" name="delete_{{ emp.id }}" value="1" title="Delete this employee">
+                        </td>
+                        <td><strong>{{ emp.name }}</strong></td>
+                        <td>
+                            <input type="hidden" name="emp_id" value="{{ emp.id }}">
+                            <input type="email" name="email_{{ emp.id }}" value="{{ emp.email or '' }}" class="form-control form-control-sm">
+                        </td>
+                        <td>
+                            <input type="text" name="phone_{{ emp.id }}" value="{{ emp.phone or '' }}" class="form-control form-control-sm">
+                        </td>
+                        <td>
+                            <input type="text" name="department_{{ emp.id }}" value="{{ emp.department or '' }}" class="form-control form-control-sm">
+                        </td>
+                        <td>
+                            <select name="project_{{ emp.id }}" class="form-select form-select-sm">
+                                <option value="0">-- None --</option>
+                                {% for p in projects %}
+                                <option value="{{ p.id }}" {{ 'selected' if emp.project_id == p.id }}>{{ p.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="6" class="text-center text-muted py-4">No employees found.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% if employees %}
+        <div class="card-footer d-flex justify-content-between">
+            <a href="{{ url_for('list_employees') }}" class="btn btn-outline-secondary">Cancel</a>
+            <button type="submit" class="btn btn-dexis"><i class="bi bi-check-lg"></i> Save Changes</button>
+        </div>
+        {% endif %}
+    </div>
+</form>
+{% endblock %}

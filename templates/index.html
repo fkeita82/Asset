@@ -1,0 +1,296 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard - IT Asset Manager{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1><i class="bi bi-speedometer2"></i> Dashboard</h1>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-2">
+        <a href="{{ url_for('list_assets') }}" class="text-decoration-none">
+            <div class="card text-bg-primary">
+                <div class="card-body text-center">
+                    <h2 class="mb-0">{{ stats.total }}</h2>
+                    <p class="mb-0 small">Total Assets</p>
+                </div>
+            </div>
+        </a>
+    </div>
+    <div class="col-md-2">
+        <a href="{{ url_for('list_assets', status='Deployed') }}" class="text-decoration-none">
+            <div class="card text-bg-success">
+                <div class="card-body text-center">
+                    <h2 class="mb-0">{{ stats.deployed }}</h2>
+                    <p class="mb-0 small">Deployed</p>
+                </div>
+            </div>
+        </a>
+    </div>
+    <div class="col-md-2">
+        <a href="{{ url_for('list_assets', status='Assigned') }}" class="text-decoration-none">
+            <div class="card text-bg-info">
+                <div class="card-body text-center">
+                    <h2 class="mb-0">{{ stats.assigned }}</h2>
+                    <p class="mb-0 small">Assigned</p>
+                </div>
+            </div>
+        </a>
+    </div>
+    <div class="col-md-2">
+        <a href="{{ url_for('list_assets', status='In-Storage') }}" class="text-decoration-none">
+            <div class="card text-bg-secondary">
+                <div class="card-body text-center">
+                    <h2 class="mb-0">{{ stats.in_storage }}</h2>
+                    <p class="mb-0 small">In-Storage</p>
+                </div>
+            </div>
+        </a>
+    </div>
+    <div class="col-md-2">
+        <a href="{{ url_for('list_assets', status='In Repair') }}" class="text-decoration-none">
+            <div class="card text-bg-warning">
+                <div class="card-body text-center">
+                    <h2 class="mb-0">{{ stats.in_repair }}</h2>
+                    <p class="mb-0 small">In Repair</p>
+                </div>
+            </div>
+        </a>
+    </div>
+    <div class="col-md-2">
+        <a href="{{ url_for('list_assets', status='Disposed') }}" class="text-decoration-none">
+            <div class="card text-bg-dark">
+                <div class="card-body text-center">
+                    <h2 class="mb-0">{{ stats.disposed }}</h2>
+                    <p class="mb-0 small">Disposed</p>
+                </div>
+            </div>
+        </a>
+    </div>
+    <div class="col-md-2">
+        <a href="{{ url_for('list_archive') }}" class="text-decoration-none">
+            <div class="card text-bg-secondary border-dark">
+                <div class="card-body text-center">
+                    <h2 class="mb-0">{{ stats.archived }}</h2>
+                    <p class="mb-0 small"><i class="bi bi-archive"></i> Archived</p>
+                </div>
+            </div>
+        </a>
+    </div>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-4">
+        <div class="card h-100">
+            <div class="card-header"><h6 class="mb-0"><i class="bi bi-pie-chart"></i> Assets by Category</h6></div>
+            <div class="card-body">
+                <canvas id="chartCategory" height="220"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card h-100">
+            <div class="card-header"><h6 class="mb-0"><i class="bi bi-pie-chart"></i> Assets by Status</h6></div>
+            <div class="card-body">
+                <canvas id="chartStatus" height="220"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card h-100">
+            <div class="card-header"><h6 class="mb-0"><i class="bi bi-pie-chart"></i> Workstation Breakdown</h6></div>
+            <div class="card-body">
+                <canvas id="chartWorkstations" height="220"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-2">
+        <div class="card">
+            <div class="card-body text-center">
+                <h3 class="mb-0">{{ stats.laptops }}</h3>
+                <p class="mb-0 small"><i class="bi bi-laptop"></i> Laptops</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-2">
+        <div class="card">
+            <div class="card-body text-center">
+                <h3 class="mb-0">{{ stats.desktops }}</h3>
+                <p class="mb-0 small"><i class="bi bi-pc"></i> Desktops</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-2">
+        <div class="card">
+            <div class="card-body text-center">
+                <h3 class="mb-0">{{ stats.network }}</h3>
+                <p class="mb-0 small"><i class="bi bi-hdd-network"></i> Network</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-2">
+        <div class="card">
+            <div class="card-body text-center">
+                <h3 class="mb-0">{{ stats.printers }}</h3>
+                <p class="mb-0 small"><i class="bi bi-printer"></i> Printers</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-2">
+        <div class="card">
+            <div class="card-body text-center">
+                <h3 class="mb-0">{{ stats.monitors }}</h3>
+                <p class="mb-0 small"><i class="bi bi-tv"></i> Monitors</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-2">
+        <div class="card">
+            <div class="card-body text-center">
+                <h3 class="mb-0">{{ stats.docking_stations }}</h3>
+                <p class="mb-0 small"><i class="bi bi-plug"></i> Docking St.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-3">
+        <div class="card">
+            <div class="card-body text-center">
+                <h3 class="mb-0"><i class="bi bi-people"></i> {{ stats.employees }}</h3>
+                <p class="mb-0 small">Employees</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card">
+            <div class="card-body text-center">
+                <h3 class="mb-0"><i class="bi bi-diagram-3"></i> {{ stats.projects }}</h3>
+                <p class="mb-0 small">Projects</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card">
+            <div class="card-body text-center">
+                <h3 class="mb-0">{{ stats.workstations }}</h3>
+                <p class="mb-0 small">Total Workstations</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card">
+            <div class="card-body text-center">
+                <h3 class="mb-0">{{ stats.retired }}</h3>
+                <p class="mb-0 small">Retired</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <h5 class="mb-0">Recently Updated</h5>
+    </div>
+    <div class="card-body p-0">
+        <table class="table table-striped mb-0">
+            <thead>
+                <tr>
+                    <th>Asset Tag</th>
+                    <th>Type</th>
+                    <th>Serial</th>
+                    <th>User</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for asset in recent %}
+                <tr>
+                    <td><a href="{{ url_for('view_asset', id=asset.id) }}">{{ asset.asset_tag_id or '—' }}</a></td>
+                    <td><span class="badge bg-info">{{ asset.sub_category }}</span></td>
+                    <td>{{ asset.serial_number }}</td>
+                    <td>{{ asset.assigned_user or '-' }}</td>
+                    <td>
+                        <span class="badge {% if asset.status == 'In-Storage' %}bg-secondary{% elif asset.status == 'Assigned' %}bg-info{% elif asset.status == 'Deployed' %}bg-success{% elif asset.status == 'In Repair' %}bg-warning{% elif asset.status == 'Retired' or asset.status == 'Disposed' %}bg-dark{% else %}bg-secondary{% endif %}">
+                            {{ asset.status }}
+                        </span>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="5" class="text-center text-muted py-3">No assets yet.
+                        {% if has_perm('asset.create') %}
+                        <a href="{{ url_for('new_asset') }}">Add one</a>.
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+const DEXIS_BLUE = '#003A5D';
+const DEXIS_PURPLE = '#712D91';
+const COLORS = {
+    blue: DEXIS_BLUE,
+    purple: DEXIS_PURPLE,
+    teal: '#008080',
+    orange: '#E87722',
+    green: '#2E8540',
+    red: '#C84C09',
+    pink: '#A03D6B',
+    gray: '#6C6F70',
+    gold: '#FDB81E',
+    cyan: '#009BDF',
+    lime: '#97C140',
+};
+
+new Chart(document.getElementById('chartCategory'), {
+    type: 'doughnut',
+    data: {
+        labels: ['Workstations', 'Network Devices', 'Printers', 'Monitors', 'Docking Stations'],
+        datasets: [{
+            data: [{{ stats.workstations }}, {{ stats.network }}, {{ stats.printers }}, {{ stats.monitors }}, {{ stats.docking_stations }}],
+            backgroundColor: [COLORS.blue, COLORS.teal, COLORS.orange, COLORS.green, COLORS.purple],
+            borderWidth: 1,
+        }]
+    },
+    options: { plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, padding: 8 } } } }
+});
+
+new Chart(document.getElementById('chartStatus'), {
+    type: 'doughnut',
+    data: {
+        labels: ['In-Storage', 'Assigned', 'Deployed', 'In Repair', 'Retired', 'Disposed'],
+        datasets: [{
+            data: [{{ stats.in_storage }}, {{ stats.assigned }}, {{ stats.deployed }}, {{ stats.in_repair }}, {{ stats.retired }}, {{ stats.disposed }}],
+            backgroundColor: [COLORS.gray, COLORS.cyan, COLORS.green, COLORS.gold, COLORS.blue, COLORS.red],
+            borderWidth: 1,
+        }]
+    },
+    options: { plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, padding: 8 } } } }
+});
+
+new Chart(document.getElementById('chartWorkstations'), {
+    type: 'doughnut',
+    data: {
+        labels: ['Laptops', 'Desktops'],
+        datasets: [{
+            data: [{{ stats.laptops }}, {{ stats.desktops }}],
+            backgroundColor: [COLORS.purple, COLORS.blue],
+            borderWidth: 1,
+        }]
+    },
+    options: { plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, padding: 8 } } } }
+});
+</script>
+{% endblock %}

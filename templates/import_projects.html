@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+
+{% block title %}Import Projects - IT Asset Manager{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-6">
+        <h1 class="mb-4"><i class="bi bi-upload"></i> Import Projects from CSV</h1>
+
+        <div class="card mb-4">
+            <div class="card-header"><h5 class="mb-0">Instructions</h5></div>
+            <div class="card-body">
+                <p>Upload a CSV file with the following columns (first row must be headers):</p>
+                <code>Name, Description, Department, Start Date, End Date, Status, Notes</code>
+                <hr>
+                <ul class="mb-0 small">
+                    <li><strong>Name</strong> is required and must be unique.</li>
+                    <li>Dates must be in <code>YYYY-MM-DD</code> format.</li>
+                    <li>Status defaults to <code>Active</code> if blank.</li>
+                </ul>
+            </div>
+        </div>
+
+        <form method="post" enctype="multipart/form-data" class="card">
+            <div class="card-body">
+                {{ form.hidden_tag() }}
+                <div class="mb-3">
+                    {{ form.csv_file.label(class='form-label') }}
+                    {{ form.csv_file(class='form-control' + (' is-invalid' if form.csv_file.errors else '')) }}
+                    {% for e in form.csv_file.errors %}<div class="invalid-feedback">{{ e }}</div>{% endfor %}
+                </div>
+            </div>
+            <div class="card-footer d-flex justify-content-between">
+                <a href="{{ url_for('list_projects') }}" class="btn btn-outline-secondary">Cancel</a>
+                {{ form.submit(class='btn btn-dexis') }}
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

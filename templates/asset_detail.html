@@ -1,0 +1,137 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ asset.asset_tag_id or 'Untagged Asset' }} - IT Asset Manager{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1><i class="bi bi-box"></i> {{ asset.asset_tag_id or 'Untagged Asset' }}{% if asset.is_archived %} <span class="badge bg-dark">Archived</span>{% endif %}</h1>
+    <div>
+        {% if not asset.is_archived %}
+            {% if has_perm('asset.edit') %}
+            <a href="{{ url_for('edit_asset', id=asset.id) }}" class="btn btn-dexis"><i class="bi bi-pencil"></i> Edit</a>
+            <form method="post" action="{{ url_for('archive_asset', id=asset.id) }}" style="display:inline" onsubmit="return confirm('Archive {{ asset.asset_tag_id or "this asset" }}?')">
+                <button type="submit" class="btn btn-warning"><i class="bi bi-archive"></i> Archive</button>
+            </form>
+            {% endif %}
+            {% if has_perm('asset.delete') %}
+            <form method="post" action="{{ url_for('delete_asset', id=asset.id) }}" style="display:inline" onsubmit="return confirm('Delete {{ asset.asset_tag_id or "this asset" }}?')">
+                <button type="submit" class="btn btn-danger"><i class="bi bi-trash"></i> Delete</button>
+            </form>
+            {% endif %}
+            <a href="{{ url_for('list_assets') }}" class="btn btn-outline-secondary">Back</a>
+        {% else %}
+            {% if has_perm('asset.edit') %}
+            <form method="post" action="{{ url_for('restore_asset', id=asset.id) }}" style="display:inline">
+                <button type="submit" class="btn btn-success"><i class="bi bi-arrow-counterclockwise"></i> Restore</button>
+            </form>
+            {% endif %}
+            {% if has_perm('asset.delete') %}
+            <form method="post" action="{{ url_for('permanent_delete_asset', id=asset.id) }}" style="display:inline" onsubmit="return confirm('Permanently delete {{ asset.asset_tag_id or "this asset" }}? This cannot be undone.')">
+                <button type="submit" class="btn btn-danger"><i class="bi bi-trash"></i> Permanent Delete</button>
+            </form>
+            {% endif %}
+            <a href="{{ url_for('list_archive') }}" class="btn btn-outline-secondary">Back to Archive</a>
+        {% endif %}
+    </div>
+</div>
+
+<div class="row g-3">
+    <div class="col-md-6">
+        <div class="card h-100">
+            <div class="card-header"><h5 class="mb-0">Classification</h5></div>
+            <div class="card-body">
+                <table class="table table-sm">
+                    <tr><th>Category</th><td><span class="badge bg-primary">{{ asset.category }}</span></td></tr>
+                    <tr><th>Type</th><td><span class="badge bg-info">{{ asset.sub_category }}</span></td></tr>
+                    <tr><th>Status</th>
+                        <td>
+                            <span class="badge {% if asset.status == 'In-Storage' %}bg-secondary{% elif asset.status == 'Assigned' %}bg-info{% elif asset.status == 'Deployed' %}bg-success{% elif asset.status == 'In Repair' %}bg-warning text-dark{% elif asset.status == 'Retired' or asset.status == 'Disposed' %}bg-dark{% else %}bg-secondary{% endif %}">
+                                {{ asset.status }}
+                            </span>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card h-100">
+            <div class="card-header"><h5 class="mb-0">Identification</h5></div>
+            <div class="card-body">
+                <table class="table table-sm">
+                    <tr><th>Asset Tag ID</th><td><strong>{{ asset.asset_tag_id or '—' }}</strong></td></tr>
+                    <tr><th>Serial Number</th><td>{{ asset.serial_number }}</td></tr>
+                    <tr><th>Manufacturer</th><td>{{ asset.manufacturer or '-' }}</td></tr>
+                    <tr><th>Model</th><td>{{ asset.model or '-' }}</td></tr>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card h-100">
+            <div class="card-header"><h5 class="mb-0">Assignment</h5></div>
+            <div class="card-body">
+                <table class="table table-sm">
+                    <tr><th>Assigned User</th>
+                        <td>
+                            {% if asset.assigned_employee %}
+                                <a href="{{ url_for('view_employee', id=asset.assigned_employee.id) }}">{{ asset.assigned_employee.name }}</a>
+                            {% else %}
+                                -
+                            {% endif %}
+                        </td>
+                    </tr>
+                    <tr><th>Project</th>
+                        <td>
+                            {% if asset.project %}
+                                <a href="{{ url_for('view_project', id=asset.project.id) }}">{{ asset.project.name }}</a>
+                            {% else %}
+                                -
+                            {% endif %}
+                        </td>
+                    </tr>
+                    <tr><th>Location</th><td>{{ asset.location or '-' }}</td></tr>
+                    <tr><th>Department</th><td>{{ asset.department or '-' }}</td></tr>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card h-100">
+            <div class="card-header"><h5 class="mb-0">Dates</h5></div>
+            <div class="card-body">
+                <table class="table table-sm">
+                    <tr><th>Purchase Date</th><td>{{ asset.purchase_date.strftime('%Y-%m-%d') if asset.purchase_date else '-' }}</td></tr>
+                    <tr><th>Warranty Expiration</th>
+                        <td>
+                            {% if asset.warranty_expiration %}
+                                {% if asset.warranty_expiration < now().date() %}
+                                    <span class="text-danger">{{ asset.warranty_expiration.strftime('%Y-%m-%d') }} (Expired)</span>
+                                {% else %}
+                                    {{ asset.warranty_expiration.strftime('%Y-%m-%d') }}
+                                {% endif %}
+                            {% else %}
+                                -
+                            {% endif %}
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+    {% if asset.notes %}
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header"><h5 class="mb-0">Notes</h5></div>
+            <div class="card-body">
+                <p class="mb-0">{{ asset.notes }}</p>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+    <div class="col-12 text-muted small text-end">
+        Created: {{ asset.created_at.strftime('%Y-%m-%d %H:%M') if asset.created_at else '-' }} |
+        Updated: {{ asset.updated_at.strftime('%Y-%m-%d %H:%M') if asset.updated_at else '-' }}
+    </div>
+</div>
+{% endblock %}

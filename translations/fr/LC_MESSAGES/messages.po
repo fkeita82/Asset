@@ -1,0 +1,361 @@
+# French translations for IT Asset Manager
+msgid ""
+msgstr ""
+"Project-Id-Version: IT Asset Manager 1.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-01-01 00:00+0000\n"
+"PO-Revision-Date: 2026-01-01 00:00+0000\n"
+"Last-Translator: \n"
+"Language: fr\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+# Navigation
+msgid "Dashboard"
+msgstr "Tableau de bord"
+
+msgid "Assets"
+msgstr "Equipements"
+
+msgid "All Assets"
+msgstr "Tous les equipements"
+
+msgid "Add Asset"
+msgstr "Ajouter un equipement"
+
+msgid "Import from CSV"
+msgstr "Importer depuis CSV"
+
+msgid "Employees"
+msgstr "Employes"
+
+msgid "All Employees"
+msgstr "Tous les employes"
+
+msgid "Add Employee"
+msgstr "Ajouter un employe"
+
+msgid "Projects"
+msgstr "Projets"
+
+msgid "All Projects"
+msgstr "Tous les projets"
+
+msgid "Add Project"
+msgstr "Ajouter un projet"
+
+msgid "Admin"
+msgstr "Administration"
+
+msgid "Users"
+msgstr "Utilisateurs"
+
+msgid "Audit Log"
+msgstr "Journal d'audit"
+
+msgid "Roles"
+msgstr "Roles"
+
+msgid "Settings"
+msgstr "Parametres"
+
+msgid "Archive"
+msgstr "Archives"
+
+msgid "Change Password"
+msgstr "Changer le mot de passe"
+
+msgid "Logout"
+msgstr "Deconnexion"
+
+msgid "Login"
+msgstr "Connexion"
+
+# Dashboard
+msgid "Total Assets"
+msgstr "Total des equipements"
+
+msgid "Deployed"
+msgstr "Deployes"
+
+msgid "Assigned"
+msgstr "Assignes"
+
+msgid "In-Storage"
+msgstr "En stock"
+
+msgid "In Repair"
+msgstr "En reparation"
+
+msgid "Disposed"
+msgstr "Mis au rebut"
+
+msgid "Archived"
+msgstr "Archives"
+
+msgid "Laptops"
+msgstr "Ordinateurs portables"
+
+msgid "Desktops"
+msgstr "Ordinateurs de bureau"
+
+msgid "Network"
+msgstr "Reseau"
+
+msgid "Printers"
+msgstr "Imprimantes"
+
+msgid "Monitors"
+msgstr "Moniteurs"
+
+msgid "Docking St."
+msgstr "Stations d'accueil"
+
+msgid "Employees"
+msgstr "Employes"
+
+msgid "Projects"
+msgstr "Projets"
+
+msgid "Total Workstations"
+msgstr "Total des postes"
+
+msgid "Retired"
+msgstr "Retires"
+
+msgid "Recently Updated"
+msgstr "Recemment mis a jour"
+
+msgid "Asset Tag"
+msgstr "Tag d'equipement"
+
+msgid "Type"
+msgstr "Type"
+
+msgid "Serial"
+msgstr "Numero de serie"
+
+msgid "User"
+msgstr "Utilisateur"
+
+msgid "Status"
+msgstr "Statut"
+
+# Buttons
+msgid "Save"
+msgstr "Enregistrer"
+
+msgid "Cancel"
+msgstr "Annuler"
+
+msgid "Delete"
+msgstr "Supprimer"
+
+msgid "Edit"
+msgstr "Modifier"
+
+msgid "View"
+msgstr "Voir"
+
+msgid "Search"
+msgstr "Rechercher"
+
+msgid "Back"
+msgstr "Retour"
+
+msgid "Export CSV"
+msgstr "Exporter CSV"
+
+msgid "Add User"
+msgstr "Ajouter un utilisateur"
+
+msgid "Bulk Update"
+msgstr "Mise a jour en masse"
+
+msgid "Delete Selected"
+msgstr "Supprimer la selection"
+
+msgid "Bulk Edit"
+msgstr "Edition en masse"
+
+msgid "Merge Duplicates"
+msgstr "Fusionner les doublons"
+
+# Forms
+msgid "Category"
+msgstr "Categorie"
+
+msgid "Serial Number"
+msgstr "Numero de serie"
+
+msgid "Asset Tag ID"
+msgstr "Tag d'equipement"
+
+msgid "Assigned User"
+msgstr "Utilisateur assigne"
+
+msgid "Project"
+msgstr "Projet"
+
+msgid "Manufacturer"
+msgstr "Fabricant"
+
+msgid "Model"
+msgstr "Modele"
+
+msgid "Location"
+msgstr "Emplacement"
+
+msgid "Department"
+msgstr "Departement"
+
+msgid "Notes"
+msgstr "Notes"
+
+msgid "First Name"
+msgstr "Prenom"
+
+msgid "Last Name"
+msgstr "Nom"
+
+msgid "Email"
+msgstr "Courriel"
+
+msgid "Phone"
+msgstr "Telephone"
+
+msgid "Project Name"
+msgstr "Nom du projet"
+
+msgid "Description"
+msgstr "Description"
+
+msgid "Start Date"
+msgstr "Date de debut"
+
+msgid "End Date"
+msgstr "Date de fin"
+
+msgid "Username"
+msgstr "Nom d'utilisateur"
+
+msgid "Password"
+msgstr "Mot de passe"
+
+msgid "Full Name"
+msgstr "Nom complet"
+
+msgid "Role"
+msgstr "Role"
+
+# Status
+msgid "Active"
+msgstr "Actif"
+
+msgid "Completed"
+msgstr "Termine"
+
+msgid "On Hold"
+msgstr "En attente"
+
+msgid "Cancelled"
+msgstr "Annule"
+
+# Messages
+msgid "Asset added successfully."
+msgstr "Equipement ajoute avec succes."
+
+msgid "Asset updated successfully."
+msgstr "Equipement mis a jour avec succes."
+
+msgid "Asset deleted."
+msgstr "Equipement supprime."
+
+msgid "Asset archived."
+msgstr "Equipement archive."
+
+msgid "Asset restored."
+msgstr "Equipement restaure."
+
+msgid "Employee added successfully."
+msgstr "Employe ajoute avec succes."
+
+msgid "Employee updated successfully."
+msgstr "Employe mis a jour avec succes."
+
+msgid "Employee deleted."
+msgstr "Employe supprime."
+
+msgid "Project added successfully."
+msgstr "Projet ajoute avec succes."
+
+msgid "Project updated successfully."
+msgstr "Projet mis a jour avec succes."
+
+msgid "Project deleted."
+msgstr "Projet supprime."
+
+msgid "User created successfully."
+msgstr "Utilisateur cree avec succes."
+
+msgid "User updated successfully."
+msgstr "Utilisateur mis a jour avec succes."
+
+msgid "Password changed successfully."
+msgstr "Mot de passe change avec succes."
+
+msgid "You have been logged out."
+msgstr "Vous etes deconnecte."
+
+msgid "Please log in to access this page."
+msgstr "Veuillez vous connecter pour acceder a cette page."
+
+msgid "Invalid username or password."
+msgstr "Nom d'utilisateur ou mot de passe invalide."
+
+msgid "Username already taken."
+msgstr "Nom d'utilisateur deja utilise."
+
+msgid "Email already registered."
+msgstr "Courriel deja enregistre."
+
+# Common
+msgid "All"
+msgstr "Tous"
+
+msgid "None"
+msgstr "Aucun"
+
+msgid "Select"
+msgstr "Selectionner"
+
+msgid "Yes"
+msgstr "Oui"
+
+msgid "No"
+msgstr "Non"
+
+msgid "Actions"
+msgstr "Actions"
+
+msgid "Name"
+msgstr "Nom"
+
+msgid "Created"
+msgstr "Cree"
+
+msgid "No assets match your criteria."
+msgstr "Aucun equipement ne correspond a vos criteres."
+
+msgid "No employees found."
+msgstr "Aucun employe trouve."
+
+msgid "No users found."
+msgstr "Aucun utilisateur trouve."
+
+msgid "No projects found."
+msgstr "Aucun projet trouve."
+
+msgid "No archived assets."
+msgstr "Aucun equipement archive."

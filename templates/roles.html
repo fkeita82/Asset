@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+
+{% block title %}Roles - IT Asset Manager{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1><i class="bi bi-shield-lock"></i> Roles</h1>
+</div>
+
+<div class="row g-3">
+    {% for role in roles %}
+    <div class="col-md-4">
+        <div class="card h-100">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">
+                    <span class="badge {% if role.name == 'Admin' %}bg-danger{% elif role.name == 'Editor' %}bg-primary{% else %}bg-secondary{% endif %}">
+                        {{ role.label }}
+                    </span>
+                </h5>
+                <a href="{{ url_for('edit_role', id=role.id) }}" class="btn btn-sm btn-dexis">
+                    <i class="bi bi-pencil"></i> Edit
+                </a>
+            </div>
+            <div class="card-body">
+                <h6>Permissions ({{ role.get_permissions()|length }})</h6>
+                <ul class="list-unstyled mb-0 small">
+                    {% for perm in role.get_permissions() %}
+                    <li><i class="bi bi-check-circle text-success"></i> {{ PERM_LABELS.get(perm, perm) }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

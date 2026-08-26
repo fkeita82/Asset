@@ -1,0 +1,96 @@
+{% extends 'base.html' %}
+
+{% block title %}Settings - IT Asset Manager{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2><i class="bi bi-gear"></i> Settings</h2>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8">
+            <form method="post">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="bi bi-shield-lock"></i> Single Sign-On (SSO)</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-check form-switch mb-3">
+                            <input class="form-check-input" type="checkbox" name="sso_enabled" id="sso_enabled"
+                                   value="true" {{ 'checked' if sso_enabled else '' }}>
+                            <label class="form-check-label" for="sso_enabled">Enable SSO Login</label>
+                            <div class="form-text">When enabled, users will see SSO login buttons. Admin can always use password login.</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">SSO Provider</label>
+                            <select name="sso_provider" id="sso_provider" class="form-select">
+                                <option value="">Select provider...</option>
+                                <option value="entra" {{ 'selected' if sso_provider == 'entra' }}>Microsoft Entra ID (Azure AD)</option>
+                                <option value="okta" {{ 'selected' if sso_provider == 'okta' }}>Okta</option>
+                            </select>
+                        </div>
+
+                        <div id="entra-config" style="display: {{ 'block' if sso_provider == 'entra' else 'none' }}">
+                            <h6>Microsoft Entra ID Configuration</h6>
+                            <div class="mb-3">
+                                <label class="form-label">Tenant ID</label>
+                                <input type="text" name="entra_tenant_id" class="form-control"
+                                       value="{{ entra_tenant_id }}" placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Client ID</label>
+                                <input type="text" name="entra_client_id" class="form-control"
+                                       value="{{ entra_client_id }}" placeholder="Application (client) ID">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Client Secret</label>
+                                <input type="password" name="entra_client_secret" class="form-control"
+                                       value="{{ entra_client_secret }}" placeholder="Enter client secret">
+                                <div class="form-text">Leave unchanged to keep current value.</div>
+                            </div>
+                        </div>
+
+                        <div id="okta-config" style="display: {{ 'block' if sso_provider == 'okta' else 'none' }}">
+                            <h6>Okta Configuration</h6>
+                            <div class="mb-3">
+                                <label class="form-label">Okta Domain</label>
+                                <input type="text" name="okta_domain" class="form-control"
+                                       value="{{ okta_domain }}" placeholder="yourorg.okta.com">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Auth Server</label>
+                                <input type="text" name="okta_auth_server" class="form-control"
+                                       value="{{ okta_auth_server }}" placeholder="default">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Client ID</label>
+                                <input type="text" name="okta_client_id" class="form-control"
+                                       value="{{ okta_client_id }}" placeholder="0oa... ">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Client Secret</label>
+                                <input type="password" name="okta_client_secret" class="form-control"
+                                       value="{{ okta_client_secret }}" placeholder="Enter client secret">
+                                <div class="form-text">Leave unchanged to keep current value.</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-dexis">
+                    <i class="bi bi-check-lg"></i> Save Settings
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+document.getElementById('sso_provider').addEventListener('change', function() {
+    document.getElementById('entra-config').style.display = this.value === 'entra' ? 'block' : 'none';
+    document.getElementById('okta-config').style.display = this.value === 'okta' ? 'block' : 'none';
+});
+</script>
+{% endblock %}

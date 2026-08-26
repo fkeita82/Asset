@@ -1,0 +1,138 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ title }} - IT Asset Manager{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <h1 class="mb-4"><i class="bi bi-{{ 'plus-circle' if not asset else 'pencil-square' }}"></i> {{ title }}</h1>
+
+        <form method="post" class="card">
+            <div class="card-body">
+                {{ form.hidden_tag() }}
+
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        {{ form.category.label(class='form-label') }}
+                        {{ form.category(class='form-select' + (' is-invalid' if form.category.errors else '')) }}
+                        {% for e in form.category.errors %}<div class="invalid-feedback">{{ e }}</div>{% endfor %}
+                    </div>
+                    <div class="col-md-4">
+                        {{ form.sub_category.label(class='form-label') }}
+                        {{ form.sub_category(class='form-select' + (' is-invalid' if form.sub_category.errors else '')) }}
+                        {% for e in form.sub_category.errors %}<div class="invalid-feedback">{{ e }}</div>{% endfor %}
+                    </div>
+                    <div class="col-md-4">
+                        {{ form.status.label(class='form-label') }}
+                        {{ form.status(class='form-select') }}
+                    </div>
+                </div>
+
+                <hr class="my-3">
+                <h6 class="text-muted mb-3">Identification</h6>
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        {{ form.asset_tag_id.label(class='form-label') }}
+                        {{ form.asset_tag_id(class='form-control' + (' is-invalid' if form.asset_tag_id.errors else '')) }}
+                        {% for e in form.asset_tag_id.errors %}<div class="invalid-feedback">{{ e }}</div>{% endfor %}
+                    </div>
+                    <div class="col-md-6">
+                        {{ form.serial_number.label(class='form-label') }}
+                        {{ form.serial_number(class='form-control' + (' is-invalid' if form.serial_number.errors else '')) }}
+                        {% for e in form.serial_number.errors %}<div class="invalid-feedback">{{ e }}</div>{% endfor %}
+                    </div>
+                </div>
+
+                <hr class="my-3">
+                <h6 class="text-muted mb-3">Details</h6>
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        {{ form.manufacturer.label(class='form-label') }}
+                        {{ form.manufacturer(class='form-control') }}
+                    </div>
+                    <div class="col-md-4">
+                        {{ form.model.label(class='form-label') }}
+                        {{ form.model(class='form-control') }}
+                    </div>
+                    <div class="col-md-4">
+                        {{ form.employee_id.label(class='form-label') }}
+                        {{ form.employee_id(class='form-select') }}
+                    </div>
+                </div>
+                <div class="row g-3 mt-1">
+                    <div class="col-md-4">
+                        {{ form.project_id.label(class='form-label') }}
+                        {{ form.project_id(class='form-select') }}
+                    </div>
+                    <div class="col-md-4">
+                        {{ form.purchase_date.label(class='form-label') }}
+                        {{ form.purchase_date(class='form-control', type='date') }}
+                    </div>
+                    <div class="col-md-4">
+                        {{ form.warranty_expiration.label(class='form-label') }}
+                        {{ form.warranty_expiration(class='form-control', type='date') }}
+                    </div>
+                </div>
+
+                <hr class="my-3">
+                <h6 class="text-muted mb-3">Location</h6>
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        {{ form.location.label(class='form-label') }}
+                        {{ form.location(class='form-control') }}
+                    </div>
+                    <div class="col-md-6">
+                        {{ form.department.label(class='form-label') }}
+                        {{ form.department(class='form-control') }}
+                    </div>
+                </div>
+
+                <hr class="my-3">
+                <div class="row">
+                    <div class="col">
+                        {{ form.notes.label(class='form-label') }}
+                        {{ form.notes(class='form-control', rows=3) }}
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer d-flex justify-content-between">
+                <a href="{{ url_for('list_assets') }}" class="btn btn-outline-secondary">Cancel</a>
+                {{ form.submit(class='btn btn-dexis') }}
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const cat = document.getElementById('category');
+    const sub = document.getElementById('sub_category');
+
+    function loadSubcategories() {
+        const category = cat.value;
+        sub.innerHTML = '<option value="">Loading...</option>';
+        fetch('{{ url_for("subcategories") }}?category=' + encodeURIComponent(category))
+            .then(r => r.json())
+            .then(data => {
+                sub.innerHTML = '<option value="">-- Select --</option>';
+                data.forEach(s => {
+                    const opt = document.createElement('option');
+                    opt.value = s;
+                    opt.textContent = s;
+                    sub.appendChild(opt);
+                });
+            });
+    }
+
+    cat.addEventListener('change', loadSubcategories);
+
+    const initial = '{{ (asset.sub_category if asset else "") }}';
+    if (cat.value && initial) {
+        loadSubcategories();
+        setTimeout(() => { sub.value = initial; }, 100);
+    }
+});
+</script>
+{% endblock %}

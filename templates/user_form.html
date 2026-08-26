@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ title }} - IT Asset Manager{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <h1 class="mb-4"><i class="bi bi-{{ 'person-plus' if not user else 'person-gear' }}"></i> {{ title }}</h1>
+
+        <form method="post" class="card">
+            <div class="card-body">
+                {{ form.hidden_tag() }}
+
+                <div class="mb-3">
+                    {{ form.username.label(class='form-label') }}
+                    {{ form.username(class='form-control' + (' is-invalid' if form.username.errors else '')) }}
+                    {% for e in form.username.errors %}<div class="invalid-feedback">{{ e }}</div>{% endfor %}
+                </div>
+
+                <div class="mb-3">
+                    {{ form.email.label(class='form-label') }}
+                    {{ form.email(class='form-control' + (' is-invalid' if form.email.errors else '')) }}
+                    {% for e in form.email.errors %}<div class="invalid-feedback">{{ e }}</div>{% endfor %}
+                </div>
+
+                <div class="mb-3">
+                    {{ form.name.label(class='form-label') }}
+                    {{ form.name(class='form-control') }}
+                </div>
+
+                <div class="mb-3">
+                    {{ form.password.label(class='form-label') }}
+                    {% if user %}
+                        <div class="form-text">Leave blank to keep current password.</div>
+                    {% endif %}
+                    {{ form.password(class='form-control' + (' is-invalid' if form.password.errors else '')) }}
+                    {% for e in form.password.errors %}<div class="invalid-feedback">{{ e }}</div>{% endfor %}
+                </div>
+
+                <div class="mb-3">
+                    {{ form.role.label(class='form-label') }}
+                    {{ form.role(class='form-select') }}
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Extra Permissions</label>
+                    <div class="form-text mb-2">Grant additional permissions beyond the role defaults.</div>
+                    <div class="row">
+                        {% for group, perms in PERM_GROUPS.items() %}
+                        <div class="col-md-6 mb-2">
+                            <strong>{{ group }}</strong>
+                            {% for p in perms %}
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="extra_permissions" value="{{ p }}" id="perm_{{ p|replace('.', '_') }}"
+                                    {{ 'checked' if user and p in user.get_extra_permissions() else '' }}>
+                                <label class="form-check-label" for="perm_{{ p|replace('.', '_') }}">{{ PERM_LABELS[p] }}</label>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer d-flex justify-content-between">
+                <a href="{{ url_for('list_users') }}" class="btn btn-outline-secondary">Cancel</a>
+                {{ form.submit(class='btn btn-dexis') }}
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

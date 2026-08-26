@@ -1,0 +1,90 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ project.name }} - IT Asset Manager{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1><i class="bi bi-diagram-3"></i> {{ project.name }}</h1>
+    <div>
+        {% if has_perm('project.edit') %}
+        <a href="{{ url_for('edit_project', id=project.id) }}" class="btn btn-dexis"><i class="bi bi-pencil"></i> Edit</a>
+        {% endif %}
+        {% if has_perm('project.delete') %}
+        <form method="post" action="{{ url_for('delete_project', id=project.id) }}" style="display:inline" onsubmit="return confirm('Delete {{ project.name }}?')">
+            <button type="submit" class="btn btn-danger"><i class="bi bi-trash"></i> Delete</button>
+        </form>
+        {% endif %}
+        <a href="{{ url_for('list_projects') }}" class="btn btn-outline-secondary">Back</a>
+    </div>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-6">
+        <div class="card h-100">
+            <div class="card-header"><h5 class="mb-0">Details</h5></div>
+            <div class="card-body">
+                <table class="table table-sm">
+                    <tr><th>Name</th><td>{{ project.name }}</td></tr>
+                    <tr><th>Status</th>
+                        <td>
+                            <span class="badge {% if project.status == 'Active' %}bg-success{% elif project.status == 'Completed' %}bg-primary{% elif project.status == 'On Hold' %}bg-warning text-dark{% else %}bg-secondary{% endif %}">
+                                {{ project.status }}
+                            </span>
+                        </td>
+                    </tr>
+                    <tr><th>Department</th><td>{{ project.department or '-' }}</td></tr>
+                    <tr><th>Start Date</th><td>{{ project.start_date.strftime('%Y-%m-%d') if project.start_date else '-' }}</td></tr>
+                    <tr><th>End Date</th><td>{{ project.end_date.strftime('%Y-%m-%d') if project.end_date else '-' }}</td></tr>
+                </table>
+                {% if project.description %}
+                <hr>
+                <h6>Description</h6>
+                <p class="mb-0">{{ project.description }}</p>
+                {% endif %}
+                {% if project.notes %}
+                <hr>
+                <h6>Notes</h6>
+                <p class="mb-0">{{ project.notes }}</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card h-100">
+            <div class="card-header"><h5 class="mb-0">Assets ({{ assets|length }})</h5></div>
+            <div class="card-body p-0">
+                <table class="table table-sm mb-0">
+                    <thead>
+                        <tr>
+                            <th>Asset Tag</th>
+                            <th>Type</th>
+                            <th>User</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for a in assets %}
+                        <tr>
+                            <td><a href="{{ url_for('view_asset', id=a.id) }}">{{ a.asset_tag_id or '—' }}</a></td>
+                            <td><span class="badge bg-info">{{ a.sub_category }}</span></td>
+                            <td>{{ a.assigned_user or '-' }}</td>
+                            <td>
+                                <span class="badge {% if a.status == 'In-Storage' %}bg-secondary{% elif a.status == 'Assigned' %}bg-info{% elif a.status == 'Deployed' %}bg-success{% elif a.status == 'In Repair' %}bg-warning text-dark{% elif a.status == 'Retired' or a.status == 'Disposed' %}bg-dark{% else %}bg-secondary{% endif %}">
+                                    {{ a.status }}
+                                </span>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr><td colspan="4" class="text-center text-muted py-3">No assets in this project.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="text-muted small text-end">
+    Created: {{ project.created_at.strftime('%Y-%m-%d %H:%M') if project.created_at else '-' }} |
+    Updated: {{ project.updated_at.strftime('%Y-%m-%d %H:%M') if project.updated_at else '-' }}
+</div>
+{% endblock %}
