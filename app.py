@@ -178,18 +178,21 @@ def login_okta():
         flash('Okta SSO is not configured.', 'danger')
         return redirect(url_for('login'))
 
-    # Register dynamically if not already registered
-    if not oauth._clients.get('okta'):
-        okta_secret = Setting.get('okta_client_secret') or app.config.get('OKTA_CLIENT_SECRET')
-        okta_domain = Setting.get('okta_domain') or app.config.get('OKTA_DOMAIN')
-        okta_server = Setting.get('okta_auth_server') or app.config.get('OKTA_AUTH_SERVER', 'default')
-        oauth.register(
-            name='okta',
-            client_id=okta_id,
-            client_secret=okta_secret,
-            server_metadata_url=f'https://{okta_domain}/oauth2/{okta_server}/.well-known/openid-configuration',
-            client_kwargs={'scope': 'openid email profile'},
-        )
+    okta_secret = Setting.get('okta_client_secret') or app.config.get('OKTA_CLIENT_SECRET')
+    okta_domain = Setting.get('okta_domain') or app.config.get('OKTA_DOMAIN')
+    okta_server = Setting.get('okta_auth_server') or app.config.get('OKTA_AUTH_SERVER', 'default')
+
+    if not okta_domain:
+        flash('Okta domain is not configured.', 'danger')
+        return redirect(url_for('login'))
+
+    oauth.register(
+        name='okta',
+        client_id=okta_id,
+        client_secret=okta_secret,
+        server_metadata_url=f'https://{okta_domain}/oauth2/{okta_server}/.well-known/openid-configuration',
+        client_kwargs={'scope': 'openid email profile'},
+    )
 
     redirect_uri = url_for('sso_callback', provider='okta', _external=True)
     return oauth.okta.authorize_redirect(redirect_uri)
@@ -202,17 +205,20 @@ def login_entra():
         flash('Entra ID SSO is not configured.', 'danger')
         return redirect(url_for('login'))
 
-    # Register dynamically if not already registered
-    if not oauth._clients.get('entra'):
-        entra_secret = Setting.get('entra_client_secret') or app.config.get('ENTRA_CLIENT_SECRET')
-        entra_tenant = Setting.get('entra_tenant_id') or app.config.get('ENTRA_TENANT_ID')
-        oauth.register(
-            name='entra',
-            client_id=entra_id,
-            client_secret=entra_secret,
-            server_metadata_url=f'https://login.microsoftonline.com/{entra_tenant}/v2.0/.well-known/openid-configuration',
-            client_kwargs={'scope': 'openid email profile'},
-        )
+    entra_secret = Setting.get('entra_client_secret') or app.config.get('ENTRA_CLIENT_SECRET')
+    entra_tenant = Setting.get('entra_tenant_id') or app.config.get('ENTRA_TENANT_ID')
+
+    if not entra_tenant:
+        flash('Entra ID tenant is not configured.', 'danger')
+        return redirect(url_for('login'))
+
+    oauth.register(
+        name='entra',
+        client_id=entra_id,
+        client_secret=entra_secret,
+        server_metadata_url=f'https://login.microsoftonline.com/{entra_tenant}/v2.0/.well-known/openid-configuration',
+        client_kwargs={'scope': 'openid email profile'},
+    )
 
     redirect_uri = url_for('sso_callback', provider='entra', _external=True)
     return oauth.entra.authorize_redirect(redirect_uri)
