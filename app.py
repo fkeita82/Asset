@@ -190,7 +190,7 @@ def login_okta():
         name='okta',
         client_id=okta_id,
         client_secret=okta_secret,
-        server_metadata_url=f'https://{okta_domain}/oauth2/{okta_server}/.well-known/openid-configuration',
+        server_metadata_url=f'https://{okta_domain}/.well-known/openid-configuration',
         client_kwargs={'scope': 'openid email profile'},
     )
 
