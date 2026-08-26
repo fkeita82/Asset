@@ -7,6 +7,7 @@ from functools import wraps
 from flask import Flask, render_template, request, redirect, url_for, flash, jsonify, send_file, abort, session, g
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 from flask_babel import Babel, gettext as _, lazy_gettext as _l
+from werkzeug.middleware.proxy_fix import ProxyFix
 from authlib.integrations.flask_client import OAuth
 from sqlalchemy import func
 from config import Config
@@ -21,6 +22,7 @@ app = Flask(__name__)
 app.config.from_object(Config)
 app.config['LANGUAGES'] = {'en': 'English', 'fr': 'Francais'}
 app.config['BABEL_DEFAULT_LOCALE'] = 'en'
+app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_port=1)
 db.init_app(app)
 
 oauth = OAuth(app)
