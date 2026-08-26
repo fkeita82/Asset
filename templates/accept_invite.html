@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+
+{% block title %}Set Your Password - IT Asset Manager{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center mt-5">
+    <div class="col-md-5">
+        <div class="card">
+            <div class="card-body p-4">
+                <h3 class="text-center mb-2"><i class="bi bi-shield-lock"></i> IT Asset Manager</h3>
+                <p class="text-center text-muted mb-4">Set your password to activate your account</p>
+
+                <div class="alert alert-info mb-3">
+                    <strong>{{ invite.name }}</strong><br>
+                    <small>{{ invite.email }} &middot; Role: {{ invite.role }}</small>
+                </div>
+
+                <form method="post" autocomplete="off">
+                    {{ form.hidden_tag() }}
+
+                    <div class="mb-3">
+                        {{ form.password.label(class='form-label') }}
+                        {{ form.password(class='form-control' + (' is-invalid' if form.password.errors else ''), placeholder='Enter password') }}
+                        {% for e in form.password.errors %}<div class="invalid-feedback">{{ e }}</div>{% endfor %}
+                        <div class="form-text">Minimum 8 characters with uppercase, lowercase, and a number.</div>
+                    </div>
+
+                    <div class="mb-3">
+                        {{ form.confirm_password.label(class='form-label') }}
+                        {{ form.confirm_password(class='form-control' + (' is-invalid' if form.confirm_password.errors else ''), placeholder='Confirm password') }}
+                        {% for e in form.confirm_password.errors %}<div class="invalid-feedback">{{ e }}</div>{% endfor %}
+                    </div>
+
+                    {{ form.submit(class='btn btn-dexis w-100') }}
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

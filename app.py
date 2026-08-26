@@ -1,9 +1,12 @@
 import csv
 import io
 import os
+import smtplib
 from io import BytesIO
 from datetime import datetime
 from functools import wraps
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
 from flask import Flask, render_template, request, redirect, url_for, flash, jsonify, send_file, abort, session, g
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 from flask_babel import Babel, gettext as _, lazy_gettext as _l
@@ -11,12 +14,12 @@ from werkzeug.middleware.proxy_fix import ProxyFix
 from authlib.integrations.flask_client import OAuth
 from sqlalchemy import func
 from config import Config
-from models import (db, Asset, Employee, Project, User, AuditLog, Role, Setting,
+from models import (db, Asset, Employee, Project, User, AuditLog, Role, Setting, Invite,
                     ALL_PERMISSIONS, PERM_GROUPS, PERM_LABELS,
                     ROLE_DEFAULT_PERMISSIONS)
 from forms import (AssetForm, EmployeeForm, ProjectForm, AssetImportForm,
                    EmployeeImportForm, ProjectImportForm, LoginForm, UserForm,
-                   PasswordChangeForm, RoleForm)
+                   PasswordChangeForm, RoleForm, InviteForm, AcceptInviteForm)
 
 app = Flask(__name__)
 app.config.from_object(Config)
@@ -1447,6 +1450,13 @@ def settings():
         Setting.set('entra_client_id', request.form.get('entra_client_id', ''))
         Setting.set('entra_client_secret', request.form.get('entra_client_secret', ''))
         Setting.set('entra_tenant_id', request.form.get('entra_tenant_id', ''))
+        Setting.set('smtp_host', request.form.get('smtp_host', ''))
+        Setting.set('smtp_port', request.form.get('smtp_port', '587'))
+        Setting.set('smtp_user', request.form.get('smtp_user', ''))
+        smtp_pass = request.form.get('smtp_password', '')
+        if smtp_pass:
+            Setting.set('smtp_password', smtp_pass)
+        Setting.set('smtp_from_name', request.form.get('smtp_from_name', 'IT Asset Manager'))
         flash('Settings saved.', 'success')
         return redirect(url_for('settings'))
 
@@ -1460,7 +1470,132 @@ def settings():
         entra_client_id=Setting.get('entra_client_id', ''),
         entra_client_secret=Setting.get('entra_client_secret', ''),
         entra_tenant_id=Setting.get('entra_tenant_id', ''),
+        smtp_host=Setting.get('smtp_host', ''),
+        smtp_port=Setting.get('smtp_port', '587'),
+        smtp_user=Setting.get('smtp_user', ''),
+        smtp_password=Setting.get('smtp_password', ''),
+        smtp_from_name=Setting.get('smtp_from_name', 'IT Asset Manager'),
     )
+
+
+# --- Email Service ---
+
+def send_invite_email(to_email, name, invite_url):
+    smtp_host = Setting.get('smtp_host')
+    smtp_port = int(Setting.get('smtp_port', '587'))
+    smtp_user = Setting.get('smtp_user')
+    smtp_password = Setting.get('smtp_password')
+    from_name = Setting.get('smtp_from_name', 'IT Asset Manager')
+
+    if not all([smtp_host, smtp_user, smtp_password]):
+        return False, 'SMTP not configured'
+
+    msg = MIMEMultipart()
+    msg['From'] = f'{from_name} <{smtp_user}>'
+    msg['To'] = to_email
+    msg['Subject'] = f'You\'re invited to {from_name}'
+
+    msg.attach(MIMEText(f'''
+Hello {name},
+
+You have been invited to access the IT Asset Manager.
+
+Click the link below to set your password and activate your account:
+
+{invite_url}
+
+This link expires in 7 days.
+
+If you did not expect this invitation, please ignore this email.
+''', 'plain'))
+
+    try:
+        with smtplib.SMTP(smtp_host, smtp_port) as server:
+            server.starttls()
+            server.login(smtp_user, smtp_password)
+            server.send_message(msg)
+        return True, 'Email sent'
+    except Exception as e:
+        return False, str(e)
+
+
+# --- User Invites ---
+
+@app.route('/users/invite', methods=['GET', 'POST'])
+@login_required
+@permission_required('user.manage')
+def invite_user():
+    form = InviteForm()
+    if form.validate_on_submit():
+        if User.query.filter_by(email=form.email.data).first():
+            flash('A user with this email already exists.', 'danger')
+            return render_template('invite_form.html', form=form, title='Invite User')
+
+        existing_invite = Invite.query.filter_by(email=form.email.data, is_used=False).first()
+        if existing_invite and not existing_invite.is_expired():
+            flash('An active invite already exists for this email.', 'warning')
+            return render_template('invite_form.html', form=form, title='Invite User')
+
+        invite = Invite(
+            email=form.email.data,
+            name=form.name.data,
+            role=form.role.data,
+        )
+        db.session.add(invite)
+        db.session.commit()
+
+        invite_url = url_for('accept_invite', token=invite.token, _external=True)
+
+        success, message = send_invite_email(invite.email, invite.name, invite_url)
+        if success:
+            flash(f'Invite sent to {invite.email}.', 'success')
+        else:
+            flash(f'Email could not be sent: {message}. Share this link manually:', 'warning')
+            flash(invite_url, 'info')
+
+        log_audit('invite_user', 'User', invite.id, f'Invited {invite.email} as {invite.role}')
+        db.session.commit()
+        return redirect(url_for('list_users'))
+
+    return render_template('invite_form.html', form=form, title='Invite User')
+
+
+@app.route('/invite/<token>')
+def accept_invite(token):
+    invite = Invite.query.filter_by(token=token).first()
+    if not invite:
+        flash('Invalid invitation link.', 'danger')
+        return redirect(url_for('login'))
+
+    if not invite.is_valid():
+        flash('This invitation has expired or already been used.', 'danger')
+        return redirect(url_for('login'))
+
+    form = AcceptInviteForm()
+    if form.validate_on_submit():
+        user = User(
+            username=invite.email.split('@')[0],
+            email=invite.email,
+            name=invite.name,
+            role=invite.role,
+        )
+        user.set_password(form.password.data)
+
+        base_username = user.username
+        counter = 1
+        while User.query.filter_by(username=user.username).first():
+            user.username = f'{base_username}{counter}'
+            counter += 1
+
+        db.session.add(user)
+        invite.is_used = True
+        log_audit('accept_invite', 'User', user.id, f'{user.username} accepted invitation')
+        db.session.commit()
+
+        flash('Account created! You can now log in.', 'success')
+        return redirect(url_for('login'))
+
+    return render_template('accept_invite.html', form=form, invite=invite)
 
 
 # --- Error Handlers ---

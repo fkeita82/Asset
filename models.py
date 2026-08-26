@@ -1,5 +1,6 @@
 import json
-from datetime import datetime, timezone
+import secrets
+from datetime import datetime, timezone, timedelta
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -131,6 +132,30 @@ class Setting(db.Model):
         if val is None:
             return default
         return val.lower() in ('true', '1', 'yes', 'on')
+
+
+class Invite(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    email = db.Column(db.String(200), nullable=False)
+    name = db.Column(db.String(200))
+    role = db.Column(db.String(20), default='Viewer')
+    token = db.Column(db.String(64), unique=True, nullable=False, index=True)
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
+    expires_at = db.Column(db.DateTime, nullable=False)
+    is_used = db.Column(db.Boolean, default=False)
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        if not self.token:
+            self.token = secrets.token_hex(32)
+        if not self.expires_at:
+            self.expires_at = datetime.now(timezone.utc) + timedelta(days=7)
+
+    def is_expired(self):
+        return datetime.now(timezone.utc) > self.expires_at
+
+    def is_valid(self):
+        return not self.is_used and not self.is_expired()
 
 
 class AuditLog(db.Model):

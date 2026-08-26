@@ -60,6 +60,12 @@ msgstr "Roles"
 msgid "Settings"
 msgstr "Parametres"
 
+msgid "Invite User"
+msgstr "Inviter un utilisateur"
+
+msgid "Add User"
+msgstr "Ajouter un utilisateur"
+
 msgid "Archive"
 msgstr "Archives"
 

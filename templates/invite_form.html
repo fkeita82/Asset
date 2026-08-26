@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+
+{% block title %}Invite User - IT Asset Manager{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-6">
+        <h1 class="mb-4"><i class="bi bi-envelope-plus"></i> {{ title }}</h1>
+
+        <form method="post" class="card">
+            <div class="card-body">
+                {{ form.hidden_tag() }}
+
+                <div class="mb-3">
+                    {{ form.email.label(class='form-label') }}
+                    {{ form.email(class='form-control' + (' is-invalid' if form.email.errors else ''), placeholder='user@example.com') }}
+                    {% for e in form.email.errors %}<div class="invalid-feedback">{{ e }}</div>{% endfor %}
+                </div>
+
+                <div class="mb-3">
+                    {{ form.name.label(class='form-label') }}
+                    {{ form.name(class='form-control' + (' is-invalid' if form.name.errors else ''), placeholder='John Doe') }}
+                    {% for e in form.name.errors %}<div class="invalid-feedback">{{ e }}</div>{% endfor %}
+                </div>
+
+                <div class="mb-3">
+                    {{ form.role.label(class='form-label') }}
+                    {{ form.role(class='form-select') }}
+                </div>
+            </div>
+            <div class="card-footer d-flex justify-content-between">
+                <a href="{{ url_for('list_users') }}" class="btn btn-outline-secondary">Cancel</a>
+                {{ form.submit(class='btn btn-dexis') }}
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

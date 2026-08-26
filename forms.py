@@ -7,7 +7,7 @@ from wtforms.validators import DataRequired, Optional, Email, EqualTo, Length, V
 class PasswordStrength:
     """Validate password strength with minimum requirements."""
     def __init__(self, min_length=8, require_upper=True, require_lower=True,
-                 require_digit=True, require_special=True):
+                 require_digit=True, require_special=False):
         self.min_length = min_length
         self.require_upper = require_upper
         self.require_lower = require_lower
@@ -144,3 +144,20 @@ class ProjectImportForm(FlaskForm):
         FileAllowed(['csv'], 'CSV files only'),
     ])
     submit = SubmitField('Import')
+
+
+class InviteForm(FlaskForm):
+    email = StringField('Email', validators=[DataRequired(), Email()])
+    name = StringField('Full Name', validators=[DataRequired()])
+    role = SelectField('Role', choices=[
+        ('Viewer', 'Viewer'),
+        ('Editor', 'Editor'),
+        ('Admin', 'Admin'),
+    ], default='Viewer')
+    submit = SubmitField('Send Invite')
+
+
+class AcceptInviteForm(FlaskForm):
+    password = PasswordField('Password', validators=[DataRequired(), PasswordStrength()])
+    confirm_password = PasswordField('Confirm Password', validators=[DataRequired(), EqualTo('password', message='Passwords must match.')])
+    submit = SubmitField('Set Password & Activate Account')

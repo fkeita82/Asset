@@ -79,6 +79,43 @@
                     </div>
                 </div>
 
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="bi bi-envelope"></i> Email (SMTP)</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-text mb-3">Configure SMTP to send user invite emails.</div>
+                        <div class="row">
+                            <div class="col-md-8 mb-3">
+                                <label class="form-label">SMTP Host</label>
+                                <input type="text" name="smtp_host" class="form-control"
+                                       value="{{ smtp_host }}" placeholder="smtp.office365.com">
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Port</label>
+                                <input type="text" name="smtp_port" class="form-control"
+                                       value="{{ smtp_port }}" placeholder="587">
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">SMTP Username (email)</label>
+                            <input type="text" name="smtp_user" class="form-control"
+                                   value="{{ smtp_user }}" placeholder="your-email@company.com">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">SMTP Password</label>
+                            <input type="password" name="smtp_password" class="form-control"
+                                   value="{{ smtp_password }}" placeholder="Enter password">
+                            <div class="form-text">Leave unchanged to keep current value.</div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">From Name</label>
+                            <input type="text" name="smtp_from_name" class="form-control"
+                                   value="{{ smtp_from_name }}" placeholder="IT Asset Manager">
+                        </div>
+                    </div>
+                </div>
+
                 <button type="submit" class="btn btn-dexis">
                     <i class="bi bi-check-lg"></i> Save Settings
                 </button>
