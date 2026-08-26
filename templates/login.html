@@ -3,145 +3,57 @@
 {% block title %}Login - IT Asset Manager{% endblock %}
 
 {% block content %}
-<div class="login-page">
-    <div class="login-bg-decoration">
-        <div class="bg-circle bg-circle-1"></div>
-        <div class="bg-circle bg-circle-2"></div>
-        <div class="bg-dots"></div>
-    </div>
-
-    <div class="login-card">
-        <!-- Left Branding Panel -->
-        <div class="login-branding">
-            <div class="branding-content">
-                <div class="branding-icon">
-                    <i class="bi bi-shield-check"></i>
-                </div>
-                <h1 class="branding-title">IT Asset Manager</h1>
-                <p class="branding-subtitle">Securely manage and track your IT assets across your organization with confidence.</p>
-
-                <div class="branding-features">
-                    <div class="feature-item">
-                        <div class="feature-icon"><i class="bi bi-pc-display"></i></div>
-                        <div>
-                            <div class="feature-title">Centralized Asset Tracking</div>
-                            <div class="feature-desc">All your IT assets in one place</div>
-                        </div>
-                    </div>
-                    <div class="feature-item">
-                        <div class="feature-icon"><i class="bi bi-shield-lock"></i></div>
-                        <div>
-                            <div class="feature-title">Secure & Compliant</div>
-                            <div class="feature-desc">Enterprise-grade security</div>
-                        </div>
-                    </div>
-                    <div class="feature-item">
-                        <div class="feature-icon"><i class="bi bi-graph-up"></i></div>
-                        <div>
-                            <div class="feature-title">Detailed Insights</div>
-                            <div class="feature-desc">Make data-driven decisions</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Right Login Panel -->
-        <div class="login-panel">
-            <div class="login-content">
-                <h2 class="login-heading">Welcome back</h2>
-                <p class="login-subheading">Sign in to access your account</p>
+<div class="d-flex justify-content-center align-items-center" style="min-height: 80vh;">
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body p-4">
+                <h3 class="text-center mb-4"><i class="bi bi-shield-lock"></i> IT Asset Manager</h3>
 
                 {% if sso_enabled %}
-                <div class="sso-buttons">
+                <div class="d-grid gap-2 mb-3">
                     {% if not sso_provider or sso_provider == 'entra' %}
-                    <a href="{{ url_for('login_entra') }}" class="btn btn-sso">
-                        <svg class="sso-icon" viewBox="0 0 21 21" xmlns="http://www.w3.org/2000/svg">
-                            <rect x="1" y="1" width="9" height="9" fill="#f25022"/>
-                            <rect x="11" y="1" width="9" height="9" fill="#7fba00"/>
-                            <rect x="1" y="11" width="9" height="9" fill="#00a4ef"/>
-                            <rect x="11" y="11" width="9" height="9" fill="#ffb900"/>
-                        </svg>
-                        Sign in with Microsoft Entra ID
+                    <a href="{{ url_for('login_entra') }}" class="btn btn-outline-primary">
+                        <i class="bi bi-microsoft"></i> Sign in with Microsoft Entra ID
                     </a>
                     {% endif %}
                     {% if not sso_provider or sso_provider == 'okta' %}
-                    <a href="{{ url_for('login_okta') }}" class="btn btn-sso">
-                        <svg class="sso-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <circle cx="12" cy="12" r="11" stroke="#007dc1" stroke-width="2" fill="none"/>
-                            <circle cx="12" cy="12" r="4" fill="#007dc1"/>
-                        </svg>
-                        Sign in with Okta
+                    <a href="{{ url_for('login_okta') }}" class="btn btn-outline-primary">
+                        <i class="bi bi-shield-lock"></i> Sign in with Okta
                     </a>
                     {% endif %}
                 </div>
-
-                <div class="login-divider">
-                    <span>OR</span>
-                </div>
+                <hr>
+                <p class="text-center text-muted small mb-2">Or sign in as admin:</p>
                 {% endif %}
 
                 <form method="post" autocomplete="off">
                     {{ form.hidden_tag() }}
-
-                    <div class="form-floating-group">
-                        <label for="username">Username</label>
-                        <div class="input-icon-wrapper">
-                            <i class="bi bi-person input-icon-left"></i>
-                            {{ form.username(class='form-control icon-input', placeholder='Enter your username', id='username') }}
-                        </div>
-                        {% for e in form.username.errors %}<div class="field-error">{{ e }}</div>{% endfor %}
+                    <div class="mb-3">
+                        {{ form.username.label(class='form-label') }}
+                        {{ form.username(class='form-control' + (' is-invalid' if form.username.errors else ''), placeholder='Enter username') }}
+                        {% for e in form.username.errors %}<div class="invalid-feedback">{{ e }}</div>{% endfor %}
                     </div>
-
-                    <div class="form-floating-group">
-                        <label for="password">Password</label>
-                        <div class="input-icon-wrapper">
-                            <i class="bi bi-lock input-icon-left"></i>
-                            {{ form.password(class='form-control icon-input', placeholder='Enter your password', id='password') }}
-                            <button type="button" class="password-toggle" onclick="togglePassword()">
-                                <i class="bi bi-eye" id="toggleIcon"></i>
-                            </button>
-                        </div>
-                        {% for e in form.password.errors %}<div class="field-error">{{ e }}</div>{% endfor %}
+                    <div class="mb-3">
+                        {{ form.password.label(class='form-label') }}
+                        {{ form.password(class='form-control' + (' is-invalid' if form.password.errors else ''), placeholder='Enter password') }}
+                        {% for e in form.password.errors %}<div class="invalid-feedback">{{ e }}</div>{% endfor %}
                     </div>
-
-                    <div class="login-options">
-                        <label class="remember-me">
-                            <input type="checkbox" name="remember"> Remember me
-                        </label>
-                        <a href="#" class="forgot-password">Forgot password?</a>
-                    </div>
-
-                    {{ form.submit(class='btn btn-login') }}
+                    {{ form.submit(class='btn btn-dexis w-100') }}
                 </form>
+
+                {% if not sso_enabled %}
+                <div class="text-center mt-3">
+                    <small class="text-muted">Contact your administrator for SSO access.</small>
+                </div>
+                {% endif %}
             </div>
         </div>
     </div>
-
-    <!-- Footer -->
-    <div class="login-footer">
-        <div class="footer-left">
-            Need help? Contact support at <a href="mailto:support@dexisoneline.zendesk.com">support@dexisoneline.zendesk.com</a>
-        </div>
-        <div class="footer-right">
-            &copy; 2026 Dexis Consulting Group. All rights reserved.
-        </div>
-    </div>
 </div>
-
-<script>
-function togglePassword() {
-    var x = document.getElementById("password");
-    var icon = document.getElementById("toggleIcon");
-    if (x.type === "password") {
-        x.type = "text";
-        icon.classList.remove("bi-eye");
-        icon.classList.add("bi-eye-slash");
-    } else {
-        x.type = "password";
-        icon.classList.remove("bi-eye-slash");
-        icon.classList.add("bi-eye");
-    }
-}
-</script>
+<div class="text-center mt-4">
+    <small class="text-muted">Need help? Email support at <a href="mailto:support@dexisoneline.zendesk.com">support@dexisoneline.zendesk.com</a></small>
+</div>
+<div class="text-center mt-2">
+    <small class="text-muted">&copy; Copyright 2026. All Rights Reserved</small>
+</div>
 {% endblock %}
