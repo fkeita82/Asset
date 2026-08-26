@@ -230,7 +230,7 @@ def sso_callback(provider):
             username=username,
             email=email,
             name=name,
-            role='Viewer',
+            role='Editor',
             sso_provider=provider,
             sso_provider_user_id=provider_user_id,
         )
