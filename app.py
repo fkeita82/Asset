@@ -660,6 +660,7 @@ def list_employees():
     page = request.args.get('page', 1, type=int)
     search = request.args.get('search', '').strip()
     project_id = request.args.get('project', 0, type=int)
+    sort = request.args.get('sort', '').strip()
     query = Employee.query.outerjoin(Project)
     if search:
         like = f'%{escape_like(search)}%'
@@ -672,13 +673,24 @@ def list_employees():
                 Project.name.like(like, escape='\\'),
             )
         )
-    if project_id:
+    if project_id == -1:
+        query = query.filter(Employee.project_id.is_(None))
+    elif project_id:
         query = query.filter(Employee.project_id == project_id)
-    query = query.order_by(Employee.first_name, Employee.last_name)
+    sort_map = {
+        'email': Employee.email,
+        'department': Employee.department,
+        'project': Project.name,
+        'phone': Employee.phone,
+    }
+    if sort in sort_map:
+        query = query.order_by(sort_map[sort].nullslast(), Employee.first_name, Employee.last_name)
+    else:
+        query = query.order_by(Employee.first_name, Employee.last_name)
     pagination = query.paginate(page=page, per_page=50, error_out=False)
     employees = pagination.items
     projects = Project.query.order_by(Project.name).all()
-    return render_template('employees.html', employees=employees, pagination=pagination, search=search, filter_project=project_id, projects=projects)
+    return render_template('employees.html', employees=employees, pagination=pagination, search=search, filter_project=project_id, projects=projects, sort=sort)
 
 
 @app.route('/employees/new', methods=['GET', 'POST'])
@@ -923,13 +935,14 @@ def merge_duplicates():
         flash(f'Merged {merged} duplicate(s) into {master.name}.', 'success')
         return redirect(url_for('list_employees'))
 
-    dupes = (db.session.query(Employee.first_name, Employee.last_name)
-             .group_by(Employee.first_name, Employee.last_name)
+    dupes = (db.session.query(Employee.email)
+             .filter(Employee.email.isnot(None), Employee.email != '')
+             .group_by(Employee.email)
              .having(db.func.count(Employee.id) > 1)
              .all())
     groups = []
-    for fn, ln in dupes:
-        emps = Employee.query.filter_by(first_name=fn, last_name=ln).order_by(Employee.id).all()
+    for (email,) in dupes:
+        emps = Employee.query.filter_by(email=email).order_by(Employee.id).all()
         groups.append(emps)
     return render_template('merge_duplicates.html', groups=groups)
 
