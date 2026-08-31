@@ -935,14 +935,14 @@ def merge_duplicates():
         flash(f'Merged {merged} duplicate(s) into {master.name}.', 'success')
         return redirect(url_for('list_employees'))
 
-    dupes = (db.session.query(Employee.email)
+    dupes = (db.session.query(func.lower(Employee.email), func.count(Employee.id))
              .filter(Employee.email.isnot(None), Employee.email != '')
-             .group_by(Employee.email)
-             .having(db.func.count(Employee.id) > 1)
+             .group_by(func.lower(Employee.email))
+             .having(func.count(Employee.id) > 1)
              .all())
     groups = []
-    for (email,) in dupes:
-        emps = Employee.query.filter_by(email=email).order_by(Employee.id).all()
+    for (email, _) in dupes:
+        emps = Employee.query.filter(func.lower(Employee.email) == email).order_by(Employee.id).all()
         groups.append(emps)
     return render_template('merge_duplicates.html', groups=groups)
 
