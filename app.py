@@ -890,6 +890,8 @@ def bulk_edit_employees():
                 db.session.delete(emp)
                 deleted += 1
                 continue
+            emp.first_name = request.form.get(f'first_name_{eid}', '').strip()
+            emp.last_name = request.form.get(f'last_name_{eid}', '').strip()
             emp.email = request.form.get(f'email_{eid}', '').strip() or None
             emp.phone = request.form.get(f'phone_{eid}', '').strip() or None
             emp.department = request.form.get(f'department_{eid}', '').strip() or None
