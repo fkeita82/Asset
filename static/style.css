@@ -891,3 +891,166 @@ a:hover {
         font-size: 11px;
     }
 }
+
+/* ===== DARK MODE ===== */
+html.dark {
+    color-scheme: dark;
+}
+
+html.dark body {
+    background-color: #1a1a2e;
+    color: #e0e0e0;
+}
+
+html.dark .sidebar {
+    background-color: #0d1b2a;
+}
+
+html.dark .topbar {
+    background-color: #16213e;
+    border-bottom-color: #2a2a4a;
+}
+
+html.dark .topbar .sidebar-toggle {
+    color: #ccc;
+}
+
+html.dark .topbar-right .btn-link {
+    color: #ccc;
+}
+
+html.dark .card {
+    background-color: #1e2a3a;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+}
+
+html.dark .card-header {
+    background-color: #16213e;
+    border-bottom-color: #2a2a4a;
+}
+
+html.dark .card-footer {
+    background-color: #16213e;
+    border-top-color: #2a2a4a;
+}
+
+html.dark .table {
+    color: #e0e0e0;
+}
+
+html.dark .table th {
+    color: #aaa;
+}
+
+html.dark .table-striped > tbody > tr:nth-of-type(odd) > * {
+    background-color: rgba(255,255,255,0.02);
+    color: #e0e0e0;
+}
+
+html.dark .table td,
+html.dark .table th {
+    border-color: #2a2a4a;
+}
+
+html.dark .table a {
+    color: #a78bfa;
+}
+
+html.dark .badge.bg-secondary {
+    background-color: #555 !important;
+}
+
+html.dark .text-muted {
+    color: #888 !important;
+}
+
+html.dark .form-control,
+html.dark .form-select {
+    background-color: #1e2a3a;
+    border-color: #3a3a5a;
+    color: #e0e0e0;
+}
+
+html.dark .form-control:focus,
+html.dark .form-select:focus {
+    background-color: #253347;
+    border-color: var(--dexis-purple);
+    color: #e0e0e0;
+}
+
+html.dark .alert {
+    color: #e0e0e0;
+}
+
+html.dark .page-link {
+    background-color: #1e2a3a;
+    border-color: #3a3a5a;
+    color: var(--dexis-purple);
+}
+
+html.dark .page-item.active .page-link {
+    background-color: var(--dexis-purple);
+    border-color: var(--dexis-purple);
+}
+
+html.dark .dropdown-menu {
+    background-color: #1e2a3a;
+    border-color: #3a3a5a;
+}
+
+html.dark .dropdown-item {
+    color: #e0e0e0;
+}
+
+html.dark .dropdown-item:hover {
+    background-color: #253347;
+    color: #fff;
+}
+
+html.dark .btn-outline-secondary {
+    color: #ccc;
+    border-color: #555;
+}
+
+html.dark .btn-outline-secondary:hover {
+    background-color: #3a3a5a;
+    color: #fff;
+}
+
+html.dark h1, html.dark h2, html.dark h3, html.dark h4, html.dark h5, html.dark h6 {
+    color: #e0e0e0;
+}
+
+html.dark .login-page {
+    background: #1a1a2e;
+}
+
+html.dark .login-card {
+    background: #16213e;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.4);
+}
+
+html.dark .login-heading {
+    color: #e0e0e0;
+}
+
+html.dark .icon-input {
+    background-color: #1e2a3a;
+    border-color: #3a3a5a;
+    color: #e0e0e0;
+}
+
+html.dark .form-floating-group label {
+    color: #ccc;
+}
+
+html.dark .btn-sso {
+    background: #1e2a3a;
+    border-color: #3a3a5a;
+    color: #e0e0e0;
+}
+
+html.dark .btn-sso:hover {
+    background: #253347;
+    border-color: #555;
+}
