@@ -6,9 +6,15 @@
 <div class="d-flex justify-content-between align-items-center mb-3">
     <h1><i class="bi bi-list-ul"></i> All Assets</h1>
     <div>
-        <a href="{{ url_for('export_csv', search=search, category=filter_category, type=filter_type, status=filter_status, project=filter_project) }}" class="btn btn-outline-success me-1">
+        <a href="{{ url_for('export_csv', search=search, category=filter_category, type=filter_type, status=filter_status, project=filter_project) }}" class="btn btn-outline-success btn-sm">
             <i class="bi bi-download"></i> Export CSV
         </a>
+        {% if has_perm('asset.edit') %}
+        <button type="button" class="btn btn-outline-primary btn-sm" id="bulkUpdateBtn" onclick="goBulkUpdate()" style="display:none"><i class="bi bi-pencil-square"></i> Bulk Update (<span id="topSelectedCount">0</span>)</button>
+        {% endif %}
+        {% if has_perm('asset.delete') %}
+        <button type="button" class="btn btn-outline-danger btn-sm" id="bulkDeleteBtn" onclick="bulkDeleteAssets()" style="display:none"><i class="bi bi-trash"></i> Delete Selected (<span id="topDeleteCount">0</span>)</button>
+        {% endif %}
         {% if has_perm('asset.create') %}
         <a href="{{ url_for('new_asset') }}" class="btn btn-dexis">
             <i class="bi bi-plus-lg"></i> Add Asset
@@ -178,13 +184,26 @@ document.querySelectorAll('.bulk-check').forEach(cb => cb.addEventListener('chan
 function updateSelectedCount() {
     const n = document.querySelectorAll('.bulk-check:checked').length;
     document.getElementById('selectedCount').textContent = n + ' selected';
+    const topCount = document.getElementById('topSelectedCount');
+    const topDeleteCount = document.getElementById('topDeleteCount');
+    const bulkUpdateBtn = document.getElementById('bulkUpdateBtn');
+    const bulkDeleteBtn = document.getElementById('bulkDeleteBtn');
+    if (topCount) topCount.textContent = n;
+    if (topDeleteCount) topDeleteCount.textContent = n;
+    if (bulkUpdateBtn) bulkUpdateBtn.style.display = n > 0 ? '' : 'none';
+    if (bulkDeleteBtn) bulkDeleteBtn.style.display = n > 0 ? '' : 'none';
 }
-function bulkDelete() {
+function goBulkUpdate() {
+    const form = document.getElementById('bulkAssetForm');
+    form.action = '{{ url_for("bulk_update_assets") }}';
+    form.method = 'get';
+    form.submit();
+}
+function bulkDeleteAssets() {
     const checked = document.querySelectorAll('.bulk-check:checked');
     if (!checked.length) { alert('No assets selected.'); return; }
     if (!confirm('Delete selected assets?')) return;
     const form = document.getElementById('bulkAssetForm');
-    const origAction = form.action;
     form.action = '{{ url_for("bulk_delete_assets") }}';
     form.method = 'post';
     form.submit();
