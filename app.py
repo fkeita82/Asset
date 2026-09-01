@@ -740,7 +740,7 @@ def list_employees():
         query = query.order_by(sort_map[sort].nullslast(), Employee.first_name, Employee.last_name)
     else:
         query = query.order_by(Employee.first_name, Employee.last_name)
-    pagination = query.paginate(page=page, per_page=50, error_out=False)
+    pagination = query.paginate(page=page, per_page=150, error_out=False)
     employees = pagination.items
     projects = Project.query.order_by(Project.name).all()
     return render_template('employees.html', employees=employees, pagination=pagination, search=search, filter_project=project_id, projects=projects, sort=sort)
