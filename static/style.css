@@ -942,9 +942,24 @@ html.dark .table th {
     color: #aaa;
 }
 
+html.dark .table {
+    --bs-table-bg: #1e2a3a;
+    --bs-table-striped-bg: #24344d;
+    --bs-table-striped-color: #e0e0e0;
+    --bs-table-hover-bg: #2a3d5a;
+    --bs-table-hover-color: #fff;
+}
 html.dark .table-striped > tbody > tr:nth-of-type(odd) > * {
-    background-color: rgba(255,255,255,0.02);
+    --bs-table-accent-bg: var(--bs-table-striped-bg);
     color: #e0e0e0;
+}
+html.dark .table-striped > tbody > tr:nth-of-type(even) > * {
+    --bs-table-accent-bg: #1e2a3a;
+    color: #e0e0e0;
+}
+html.dark .table-hover > tbody > tr:hover > * {
+    --bs-table-accent-bg: var(--bs-table-hover-bg);
+    color: #fff;
 }
 
 html.dark .table td,
