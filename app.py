@@ -525,6 +525,59 @@ def bulk_update_assets():
     return render_template('bulk_update_assets.html', assets=assets, projects=projects, employees=employees)
 
 
+@app.route('/assets/bulk-edit', methods=['GET', 'POST'])
+@login_required
+@permission_required('asset.edit')
+def bulk_edit_assets():
+    if request.method == 'POST':
+        ids = request.form.getlist('asset_id')
+        updated = 0
+        deleted = 0
+        for aid in ids:
+            asset = db.session.get(Asset, int(aid))
+            if not asset:
+                continue
+            if request.form.get(f'delete_{aid}'):
+                db.session.delete(asset)
+                deleted += 1
+                continue
+            tag = request.form.get(f'tag_{aid}', '').strip() or None
+            if tag and tag != asset.asset_tag_id and Asset.query.filter_by(asset_tag_id=tag).first():
+                flash(f'Skipping {asset.serial_number}: Asset Tag "{tag}" already exists.', 'warning')
+                continue
+            asset.asset_tag_id = tag
+            asset.serial_number = request.form.get(f'serial_{aid}', '').strip() or asset.serial_number
+            asset.manufacturer = request.form.get(f'manufacturer_{aid}', '').strip() or None
+            asset.model = request.form.get(f'model_{aid}', '').strip() or None
+            asset.location = request.form.get(f'location_{aid}', '').strip() or None
+            asset.department = request.form.get(f'department_{aid}', '').strip() or None
+            asset.status = request.form.get(f'status_{aid}', '').strip() or asset.status
+            if asset.status == 'Disposed':
+                asset.is_archived = True
+                asset.employee_id = None
+                asset.project_id = None
+            else:
+                eid = request.form.get(f'employee_{aid}', type=int)
+                pid = request.form.get(f'project_{aid}', type=int)
+                asset.employee_id = eid or None
+                asset.project_id = pid or None
+            updated += 1
+        if updated or deleted:
+            log_audit('bulk_edit', 'Asset', None, f'Bulk edited {updated}, deleted {deleted} asset(s)')
+            db.session.commit()
+            flash(f'Updated {updated} asset(s), deleted {deleted}.', 'success')
+        return redirect(url_for('list_assets'))
+    ids = request.args.getlist('asset_id', type=int)
+    if not ids:
+        # if no selection, show all (like employees bulk edit does)
+        assets = Asset.query.order_by(Asset.asset_tag_id).all()
+    else:
+        assets = Asset.query.filter(Asset.id.in_(ids)).order_by(Asset.asset_tag_id).all()
+    projects = Project.query.order_by(Project.name).all()
+    employees = Employee.query.order_by(Employee.first_name, Employee.last_name).all()
+    return render_template('bulk_edit_assets.html', assets=assets, projects=projects, employees=employees)
+
+
 @app.route('/assets/<int:id>')
 @login_required
 def view_asset(id):

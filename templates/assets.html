@@ -136,10 +136,10 @@
             <span id="selectedCount" class="text-muted small align-self-center">0 selected</span>
             <div>
                 {% if has_perm('asset.edit') %}
-                <button type="submit" class="btn btn-primary btn-sm"><i class="bi bi-pencil-square"></i> Bulk Update</button>
+                <button type="button" class="btn btn-primary btn-sm" onclick="goBulkUpdate()"><i class="bi bi-pencil-square"></i> Bulk Edit</button>
                 {% endif %}
                 {% if has_perm('asset.delete') %}
-                <button type="button" class="btn btn-danger btn-sm" onclick="bulkDelete()"><i class="bi bi-trash"></i> Delete Selected</button>
+                <button type="button" class="btn btn-danger btn-sm" onclick="bulkDeleteAssets()"><i class="bi bi-trash"></i> Delete Selected</button>
                 {% endif %}
             </div>
         </div>
@@ -195,7 +195,7 @@ function updateSelectedCount() {
 }
 function goBulkUpdate() {
     const form = document.getElementById('bulkAssetForm');
-    form.action = '{{ url_for("bulk_update_assets") }}';
+    form.action = '{{ url_for("bulk_edit_assets") }}';
     form.method = 'get';
     form.submit();
 }

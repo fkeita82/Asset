@@ -1,0 +1,84 @@
+{% extends 'base.html' %}
+
+{% block title %}Bulk Edit Assets - IT Asset Manager{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1><i class="bi bi-pencil-square"></i> Bulk Edit Assets</h1>
+    <a href="{{ url_for('list_assets') }}" class="btn btn-outline-secondary">Back</a>
+</div>
+
+<form method="post" onsubmit="return confirm('Save all changes?')">
+    <div class="card">
+        <div class="card-body p-0" style="overflow-x:auto">
+            <table class="table table-striped mb-0" style="min-width:1400px">
+                <thead>
+                    <tr>
+                        <th>Delete</th>
+                        <th>Asset Tag</th>
+                        <th>Serial</th>
+                        <th>Manufacturer</th>
+                        <th>Model</th>
+                        <th>Status</th>
+                        <th>Location</th>
+                        <th>Department</th>
+                        <th>Assigned User</th>
+                        <th>Project</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for asset in assets %}
+                    <tr>
+                        <td class="text-center">
+                            <input class="form-check-input" type="checkbox" name="delete_{{ asset.id }}" value="1" title="Delete">
+                        </td>
+                        <td>
+                            <input type="hidden" name="asset_id" value="{{ asset.id }}">
+                            <input type="text" name="tag_{{ asset.id }}" value="{{ asset.asset_tag_id or '' }}" class="form-control form-control-sm" style="min-width:120px">
+                        </td>
+                        <td><input type="text" name="serial_{{ asset.id }}" value="{{ asset.serial_number }}" class="form-control form-control-sm" style="min-width:130px"></td>
+                        <td><input type="text" name="manufacturer_{{ asset.id }}" value="{{ asset.manufacturer or '' }}" class="form-control form-control-sm" style="min-width:120px"></td>
+                        <td><input type="text" name="model_{{ asset.id }}" value="{{ asset.model or '' }}" class="form-control form-control-sm" style="min-width:120px"></td>
+                        <td>
+                            <select name="status_{{ asset.id }}" class="form-select form-select-sm" style="min-width:130px">
+                                {% for s in ['In-Storage','Assigned','Deployed','In Repair','Retired','Disposed'] %}
+                                <option value="{{ s }}" {{ 'selected' if asset.status==s }}>{{ s }}</option>
+                                {% endfor %}
+                            </select>
+                        </td>
+                        <td><input type="text" name="location_{{ asset.id }}" value="{{ asset.location or '' }}" class="form-control form-control-sm" style="min-width:120px"></td>
+                        <td><input type="text" name="department_{{ asset.id }}" value="{{ asset.department or '' }}" class="form-control form-control-sm" style="min-width:120px"></td>
+                        <td>
+                            <select name="employee_{{ asset.id }}" class="form-select form-select-sm" style="min-width:150px">
+                                <option value="0">-- None --</option>
+                                {% for e in employees %}
+                                <option value="{{ e.id }}" {{ 'selected' if asset.employee_id==e.id }}>{{ e.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </td>
+                        <td>
+                            <select name="project_{{ asset.id }}" class="form-select form-select-sm" style="min-width:140px">
+                                <option value="0">-- None --</option>
+                                {% for p in projects %}
+                                <option value="{{ p.id }}" {{ 'selected' if asset.project_id==p.id }}>{{ p.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="10" class="text-center text-muted py-4">No assets found.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% if assets %}
+        <div class="card-footer d-flex justify-content-between">
+            <a href="{{ url_for('list_assets') }}" class="btn btn-outline-secondary">Cancel</a>
+            <button type="submit" class="btn btn-dexis"><i class="bi bi-check-lg"></i> Save Changes</button>
+        </div>
+        {% endif %}
+    </div>
+</form>
+{% endblock %}

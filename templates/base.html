@@ -48,6 +48,14 @@
                     <i class="bi bi-upload"></i><span>{{ _('Import Assets') }}</span>
                 </a>
             </li>
+            {% endif %}
+            {% if has_perm('asset.edit') %}
+            <li class="nav-item">
+                <a class="nav-link {% if request.endpoint == 'bulk_edit_assets' %}active{% endif %}" href="{{ url_for('bulk_edit_assets') }}">
+                    <i class="bi bi-pencil-square"></i><span>{{ _('Bulk Edit Assets') }}</span>
+                </a>
+            </li>
+            {% endif %}
             {% if has_perm('asset.delete') %}
             <li class="nav-item">
                 <a class="nav-link {% if request.endpoint == 'merge_duplicate_assets' %}active{% endif %}" href="{{ url_for('merge_duplicate_assets') }}">
