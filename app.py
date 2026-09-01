@@ -949,6 +949,59 @@ def merge_duplicates():
     return render_template('merge_duplicates.html', groups=groups)
 
 
+@app.route('/assets/merge-duplicates', methods=['GET', 'POST'])
+@login_required
+@permission_required('asset.delete')
+def merge_duplicate_assets():
+    if request.method == 'POST':
+        master_id = request.form.get('master_id', type=int)
+        merge_ids = request.form.getlist('merge_ids', type=int)
+        if not master_id or not merge_ids:
+            flash('Select a master and at least one duplicate to merge.', 'danger')
+            return redirect(url_for('merge_duplicate_assets'))
+        master = db.session.get(Asset, master_id)
+        if not master:
+            flash('Master asset not found.', 'danger')
+            return redirect(url_for('merge_duplicate_assets'))
+        merged = 0
+        for aid in merge_ids:
+            if aid == master_id:
+                continue
+            dup = db.session.get(Asset, aid)
+            if not dup:
+                continue
+            db.session.delete(dup)
+            merged += 1
+        log_audit('merge', 'Asset', master_id, f'Merged {merged} duplicate(s) into {master.asset_tag_id or master.serial_number}')
+        db.session.commit()
+        flash(f'Removed {merged} duplicate(s), kept {master.asset_tag_id or master.serial_number}.', 'success')
+        return redirect(url_for('list_assets'))
+    # detect by serial_number (case-insensitive, trimmed)
+    dupes_serial = (db.session.query(func.lower(func.trim(Asset.serial_number)), func.count(Asset.id))
+                    .filter(Asset.serial_number.isnot(None), func.trim(Asset.serial_number) != '')
+                    .group_by(func.lower(func.trim(Asset.serial_number)))
+                    .having(func.count(Asset.id) > 1)
+                    .all())
+    groups = []
+    seen_ids = set()
+    for (serial, _) in dupes_serial:
+        assets = Asset.query.filter(func.lower(func.trim(Asset.serial_number)) == serial).order_by(Asset.id).all()
+        groups.append(assets)
+        seen_ids.update(a.id for a in assets)
+    # also detect by asset_tag_id duplicates (should be unique but check)
+    dupes_tag = (db.session.query(func.lower(func.trim(Asset.asset_tag_id)), func.count(Asset.id))
+                 .filter(Asset.asset_tag_id.isnot(None), func.trim(Asset.asset_tag_id) != '')
+                 .group_by(func.lower(func.trim(Asset.asset_tag_id)))
+                 .having(func.count(Asset.id) > 1)
+                 .all())
+    for (tag, _) in dupes_tag:
+        assets = Asset.query.filter(func.lower(func.trim(Asset.asset_tag_id)) == tag).order_by(Asset.id).all()
+        if any(a.id not in seen_ids for a in assets):
+            groups.append(assets)
+            seen_ids.update(a.id for a in assets)
+    return render_template('merge_duplicate_assets.html', groups=groups)
+
+
 # --- Projects ---
 
 @app.route('/projects')
