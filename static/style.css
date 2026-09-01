@@ -1081,6 +1081,11 @@ html.dark .card-body .form-text {
     color: #cbd5e1;
 }
 
+html.dark .form-label,
+html.dark label {
+    color: #cbd5e1;
+}
+
 html.dark .text-muted {
     color: #94a3b8 !important;
 }
