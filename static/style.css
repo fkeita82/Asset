@@ -1073,3 +1073,14 @@ html.dark .btn-sso:hover {
 html.dark .card-body .list-unstyled li {
     color: #cbd5e1;
 }
+
+html.dark .card-body p,
+html.dark .card-body li,
+html.dark .card-body small,
+html.dark .card-body .form-text {
+    color: #cbd5e1;
+}
+
+html.dark .text-muted {
+    color: #94a3b8 !important;
+}
