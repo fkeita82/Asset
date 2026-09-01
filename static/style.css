@@ -1069,3 +1069,7 @@ html.dark .btn-sso:hover {
     background: #253347;
     border-color: #555;
 }
+
+html.dark .card-body .list-unstyled li {
+    color: #cbd5e1;
+}
