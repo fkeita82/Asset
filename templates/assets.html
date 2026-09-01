@@ -11,6 +11,7 @@
         </a>
         {% if has_perm('asset.edit') %}
         <button type="button" class="btn btn-outline-primary btn-sm" id="bulkUpdateBtn" onclick="goBulkUpdate()" style="display:none"><i class="bi bi-pencil-square"></i> Bulk Update (<span id="topSelectedCount">0</span>)</button>
+        <button type="button" class="btn btn-primary btn-sm" id="bulkEditBtn" onclick="goBulkEdit()" style="display:none"><i class="bi bi-pencil-fill"></i> Bulk Edit (<span id="topEditCount">0</span>)</button>
         {% endif %}
         {% if has_perm('asset.delete') %}
         <button type="button" class="btn btn-outline-danger btn-sm" id="bulkDeleteBtn" onclick="bulkDeleteAssets()" style="display:none"><i class="bi bi-trash"></i> Delete Selected (<span id="topDeleteCount">0</span>)</button>
@@ -136,10 +137,11 @@
             <span id="selectedCount" class="text-muted small align-self-center">0 selected</span>
             <div>
                 {% if has_perm('asset.edit') %}
-                <button type="button" class="btn btn-primary btn-sm" onclick="goBulkUpdate()"><i class="bi bi-pencil-square"></i> Bulk Edit</button>
+                <button type="button" class="btn btn-outline-primary btn-sm" onclick="goBulkUpdate()"><i class="bi bi-pencil-square"></i> Bulk Update</button>
+                <button type="button" class="btn btn-primary btn-sm ms-1" onclick="goBulkEdit()"><i class="bi bi-pencil-fill"></i> Bulk Edit</button>
                 {% endif %}
                 {% if has_perm('asset.delete') %}
-                <button type="button" class="btn btn-danger btn-sm" onclick="bulkDeleteAssets()"><i class="bi bi-trash"></i> Delete Selected</button>
+                <button type="button" class="btn btn-danger btn-sm ms-1" onclick="bulkDeleteAssets()"><i class="bi bi-trash"></i> Delete Selected</button>
                 {% endif %}
             </div>
         </div>
@@ -185,15 +187,25 @@ function updateSelectedCount() {
     const n = document.querySelectorAll('.bulk-check:checked').length;
     document.getElementById('selectedCount').textContent = n + ' selected';
     const topCount = document.getElementById('topSelectedCount');
+    const topEditCount = document.getElementById('topEditCount');
     const topDeleteCount = document.getElementById('topDeleteCount');
     const bulkUpdateBtn = document.getElementById('bulkUpdateBtn');
+    const bulkEditBtn = document.getElementById('bulkEditBtn');
     const bulkDeleteBtn = document.getElementById('bulkDeleteBtn');
     if (topCount) topCount.textContent = n;
+    if (topEditCount) topEditCount.textContent = n;
     if (topDeleteCount) topDeleteCount.textContent = n;
     if (bulkUpdateBtn) bulkUpdateBtn.style.display = n > 0 ? '' : 'none';
+    if (bulkEditBtn) bulkEditBtn.style.display = n > 0 ? '' : 'none';
     if (bulkDeleteBtn) bulkDeleteBtn.style.display = n > 0 ? '' : 'none';
 }
 function goBulkUpdate() {
+    const form = document.getElementById('bulkAssetForm');
+    form.action = '{{ url_for("bulk_update_assets") }}';
+    form.method = 'get';
+    form.submit();
+}
+function goBulkEdit() {
     const form = document.getElementById('bulkAssetForm');
     form.action = '{{ url_for("bulk_edit_assets") }}';
     form.method = 'get';
