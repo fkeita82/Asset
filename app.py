@@ -3,7 +3,7 @@ import io
 import os
 import smtplib
 from io import BytesIO
-from datetime import datetime
+from datetime import datetime, timezone
 from functools import wraps
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
@@ -43,6 +43,22 @@ babel = Babel(app, locale_selector=get_locale)
 @app.before_request
 def before_request():
     g.locale = get_locale()
+    # 30-min inactivity timeout
+    if current_user.is_authenticated:
+        now = datetime.now(timezone.utc)
+        last = session.get('last_active')
+        if last:
+            try:
+                last_dt = datetime.fromisoformat(last)
+                if (now - last_dt).total_seconds() > 1800:
+                    logout_user()
+                    session.clear()
+                    flash('Session expired due to inactivity.', 'warning')
+                    return redirect(url_for('login'))
+            except Exception:
+                pass
+        session['last_active'] = now.isoformat()
+        session.permanent = True
 
 login_manager = LoginManager()
 login_manager.init_app(app)
@@ -165,6 +181,8 @@ def login():
         user = User.query.filter_by(username=form.username.data).first()
         if user and user.check_password(form.password.data) and user.is_active:
             login_user(user)
+            session.permanent = True
+            session['last_active'] = datetime.now(timezone.utc).isoformat()
             log_audit('login', 'User', user.id, f'User {user.username} logged in')
             db.session.commit()
             next_page = request.args.get('next')
@@ -244,6 +262,8 @@ def sso_callback(provider):
             user.name = name
 
     login_user(user)
+    session.permanent = True
+    session['last_active'] = datetime.now(timezone.utc).isoformat()
     log_audit('sso_login', 'User', user.id, f'User {user.username} logged in via {provider} SSO')
     db.session.commit()
 

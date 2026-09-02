@@ -17,6 +17,7 @@ class Config:
     SESSION_COOKIE_SECURE = 'FLASK_DEBUG' not in os.environ
     SESSION_COOKIE_HTTPONLY = True
     SESSION_COOKIE_SAMESITE = 'Lax'
+    PERMANENT_SESSION_LIFETIME = __import__('datetime').timedelta(minutes=30)
 
     # SSO Settings
     SSO_ENABLED = os.environ.get('SSO_ENABLED', 'false').lower() == 'true'
